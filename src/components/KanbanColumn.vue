@@ -1,10 +1,28 @@
 <script setup lang="ts">
-import type { Column } from '@/types'
+import type { Card, Column } from '@/types'
 import KanbanCard from './KanbanCard.vue'
+import { ref } from 'vue'
 
-defineProps<{
+const props = defineProps<{
   column: Column
 }>()
+
+const newCardTitle = ref('')
+
+function addCard() {
+  const title = newCardTitle.value.trim()
+  if (!title) return
+
+  const card: Card = {
+    id: `card-${Date.now()}`,
+    title,
+    description: '',
+    createdAt: Date.now(),
+  }
+
+  props.column.cards.push(card)
+  newCardTitle.value = ''
+}
 </script>
 
 <template>
@@ -12,6 +30,10 @@ defineProps<{
     <h3>{{ column.title }}</h3>
     <div class="cards-list">
       <KanbanCard v-for="card in column.cards" :key="card.id" :card="card" />
+    </div>
+    <div class="add-card">
+      <input v-model="newCardTitle" placeholder="Новая задача..." @keyup.enter="addCard" />
+      <button @click="addCard">+</button>
     </div>
   </div>
 </template>
@@ -28,6 +50,30 @@ defineProps<{
 
 .kanban-column h3 {
   margin: 0 0 12px;
+  font-size: 16px;
+}
+
+.add-card {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.add-card input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.add-card button {
+  padding: 8px 12px;
+  background: #4a90d9;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
   font-size: 16px;
 }
 </style>
