@@ -23,13 +23,21 @@ function addCard() {
   props.column.cards.push(card)
   newCardTitle.value = ''
 }
+
+function deleteCard(id: string) {
+  const index = props.column.cards.findIndex((c) => c.id === id)
+
+  if (index !== -1) {
+    props.column.cards.splice(index, 1)
+  }
+}
 </script>
 
 <template>
   <div class="kanban-column">
     <h3>{{ column.title }}</h3>
     <div class="cards-list">
-      <KanbanCard v-for="card in column.cards" :key="card.id" :card="card" />
+      <KanbanCard v-for="card in column.cards" :key="card.id" :card="card" @delete="deleteCard" />
     </div>
     <div class="add-card">
       <input v-model="newCardTitle" placeholder="Новая задача..." @keyup.enter="addCard" />
