@@ -2,9 +2,31 @@
 import type { Board } from '@/types'
 import KanbanColumn from './KanbanColumn.vue'
 import { initialData } from '@/data/initialData'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
-const board = ref<Board>(initialData)
+const STORAGE_KEY = 'kanban-board'
+
+function loadBoard(): Board {
+  const saved = localStorage.getItem(STORAGE_KEY)
+  if (saved) {
+    try {
+      return JSON.parse(saved) as Board
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  return structuredClone(initialData)
+}
+
+const board = ref<Board>(loadBoard())
+
+watch(
+  board,
+  (value) => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(value))
+  },
+  { deep: true },
+)
 </script>
 
 <template>
