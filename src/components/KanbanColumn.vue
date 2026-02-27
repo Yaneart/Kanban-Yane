@@ -2,6 +2,7 @@
 import type { Card, Column } from '@/types'
 import KanbanCard from './KanbanCard.vue'
 import { ref } from 'vue'
+import draggable from 'vuedraggable'
 
 const props = defineProps<{
   column: Column
@@ -36,9 +37,16 @@ function deleteCard(id: string) {
 <template>
   <div class="kanban-column">
     <h3>{{ column.title }}</h3>
-    <div class="cards-list">
-      <KanbanCard v-for="card in column.cards" :key="card.id" :card="card" @delete="deleteCard" />
-    </div>
+    <draggable
+        v-model="column.cards"
+        group="cards"
+        item-key="id"
+        class="cards-list"
+      >
+        <template #item="{ element }">
+          <KanbanCard :card="element" @delete="deleteCard" />
+        </template>
+      </draggable>
     <div class="add-card">
       <input v-model="newCardTitle" placeholder="Новая задача..." @keyup.enter="addCard" />
       <button @click="addCard">+</button>
