@@ -11,12 +11,14 @@ export const initialData: Board = {
           title: "Изучить Vue 3",
           description: "Пройти основы Composition API и реактивности",
           createdAt: Date.now(),
+          priority:"low",
         },
         {
           id: "card-2",
           title: "Сделать kanban доску",
           description: "Написать проект на Vue 3",
           createdAt: Date.now(),
+          priority:"low",
         },
       ]
     },
