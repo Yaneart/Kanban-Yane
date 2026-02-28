@@ -40,8 +40,8 @@ function togglePriority() {
 </script>
 
 <template>
-  <div class="kanban-card">
-    <button class="delete-btn" @click="emit('delete', card.id)">x</button>
+  <div :class="['kanban-card', card.priority]" @dblclick="startEditing">
+    <button class="delete-btn" @click="emit('delete', card.id)">&times;</button>
 
     <template v-if="isEditing">
       <input
@@ -58,9 +58,9 @@ function togglePriority() {
     </template>
 
     <template v-else>
-      <h4 @dblclick="startEditing">{{ card.title }}</h4>
-      <p>{{ card.description }}</p>
-      <div :class="[`marker`, card.priority]" @click="togglePriority"></div>
+      <h4>{{ card.title }}</h4>
+      <p v-if="card.description">{{ card.description }}</p>
+      <div :class="['priority-dot', card.priority]" @click.stop="togglePriority" @dblclick.stop></div>
     </template>
   </div>
 </template>
@@ -68,22 +68,45 @@ function togglePriority() {
 <style scoped>
 .kanban-card {
   position: relative;
-  background: #fff;
+  background: #362b50;
   border-radius: 8px;
-  padding: 12px;
+  padding: 8px 12px;
   margin-bottom: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  border-left: 4px solid;
+  cursor: grab;
+  transition: box-shadow 0.2s, transform 0.15s;
+}
+
+.kanban-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  transform: translateY(-1px);
+  background: #3d3260;
+}
+
+.kanban-card.low {
+  border-left-color: #61bd4f;
+}
+
+.kanban-card.medium {
+  border-left-color: #f2d600;
+}
+
+.kanban-card.high {
+  border-left-color: #eb5a46;
 }
 
 .kanban-card h4 {
   margin: 0 0 4px;
   font-size: 14px;
+  color: #e8e0f0;
+  cursor: pointer;
 }
 
 .kanban-card p {
   margin: 0;
   font-size: 12px;
-  color: #666;
+  color: #9b8ab8;
 }
 
 .delete-btn {
@@ -92,14 +115,48 @@ function togglePriority() {
   right: 4px;
   background: none;
   border: none;
-  font-size: 18px;
-  color: #999;
+  font-size: 16px;
+  color: #ccc;
   cursor: pointer;
-  padding: 0 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.2s, color 0.2s;
+}
+
+.kanban-card:hover .delete-btn {
+  opacity: 1;
 }
 
 .delete-btn:hover {
-  color: #e74c3c;
+  color: #eb5a46;
+  background: rgba(235, 90, 70, 0.1);
+}
+
+.priority-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 6px;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.priority-dot:hover {
+  transform: scale(1.5);
+}
+
+.priority-dot.low {
+  background: #61bd4f;
+}
+
+.priority-dot.medium {
+  background: #f2d600;
+}
+
+.priority-dot.high {
+  background: #eb5a46;
 }
 
 .edit-input {
@@ -107,21 +164,23 @@ function togglePriority() {
   padding: 4px 8px;
   font-size: 14px;
   font-weight: bold;
-  border: 1px solid #4a90d9;
+  border: 2px solid #a882ff;
   border-radius: 4px;
   margin-bottom: 4px;
   box-sizing: border-box;
+  outline: none;
 }
 
 .edit-textarea {
   width: 100%;
   padding: 4px 8px;
   font-size: 12px;
-  border: 1px solid #4a90d9;
+  border: 2px solid #a882ff;
   border-radius: 4px;
   resize: vertical;
   min-height: 40px;
   box-sizing: border-box;
+  outline: none;
 }
 
 .edit-actions {
@@ -131,35 +190,26 @@ function togglePriority() {
 }
 
 .save-btn {
-  padding: 4px 8px;
-  background: #4a90d9;
+  padding: 4px 12px;
+  background: #7c5cbf;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 12px;
+  font-weight: 600;
+}
+
+.save-btn:hover {
+  background: #9a6ef5;
 }
 
 .cancel-btn {
-  padding: 4px 8px;
-  background: #ccc;
+  padding: 4px 12px;
+  background: none;
   border: none;
-  border-radius: 4px;
+  color: #9b8ab8;
   cursor: pointer;
   font-size: 12px;
-}
-.marker {
-  height: 10px;
-  border-radius: 2px;
-  margin-top: 8px;
-  background-color: green;
-}
-
-.marker.medium {
-  background-color: yellow;
-}
-
-.marker.high {
-  background-color: red;
 }
 </style>
