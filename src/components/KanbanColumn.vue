@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { Card, Column } from '@/types'
 import KanbanCard from './KanbanCard.vue'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import draggable from 'vuedraggable'
 
 const props = defineProps<{
   column: Column
+  searchQuery: string
 }>()
 
 const emit = defineEmits<{
@@ -15,6 +16,12 @@ const emit = defineEmits<{
 const newCardTitle = ref('')
 const isEditing = ref(false)
 const editTitle = ref('')
+
+const filteredCards = computed(() => {
+  const query = props.searchQuery.toLowerCase().trim()
+  if (!query) return props.column.cards
+  return props.column.cards.filter((card) => card.title.toLowerCase().includes(query))
+})
 
 function startEditing() {
   editTitle.value = props.column.title
@@ -41,7 +48,7 @@ function addCard() {
     title,
     description: '',
     createdAt: Date.now(),
-    priority:'low',
+    priority: 'low',
   }
 
   props.column.cards.push(card)
@@ -75,7 +82,7 @@ function deleteCard(id: string) {
     <template v-else>
       <h3 @dblclick="startEditing">{{ column.title }} ({{ column.cards.length }})</h3>
     </template>
-    <draggable v-model="column.cards" group="cards" item-key="id" class="cards-list">
+    <draggable :list="filteredCards" group="cards" item-key="id" class="cards-list">
       <template #item="{ element }">
         <KanbanCard :card="element" @delete="deleteCard" />
       </template>

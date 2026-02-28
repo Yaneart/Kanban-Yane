@@ -3,7 +3,7 @@ import type { Board, Column } from '@/types'
 import KanbanColumn from './KanbanColumn.vue'
 import { initialData } from '@/data/initialData'
 import draggable from 'vuedraggable'
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 const STORAGE_KEY = 'kanban-board'
 
@@ -21,6 +21,7 @@ function loadBoard(): Board {
 
 const newColumnTitle = ref('')
 const board = ref<Board>(loadBoard())
+const searchQuery = ref('')
 
 function addColumn() {
   const title = newColumnTitle.value.trim()
@@ -57,9 +58,15 @@ watch(
 
 <template>
   <div class="kanban-board">
+    <input v-model="searchQuery" placeholder="Фильтр..." />
     <draggable v-model="board.columns" group="column" item-key="id" class="column-list">
       <template #item="{ element }">
-        <KanbanColumn :key="element.id" :column="element" @delete="deleteColumn" />
+        <KanbanColumn
+          :key="element.id"
+          :search-query="searchQuery"
+          :column="element"
+          @delete="deleteColumn"
+        />
       </template>
     </draggable>
     <div class="add-column">
