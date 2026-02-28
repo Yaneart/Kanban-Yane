@@ -8,7 +8,29 @@ const props = defineProps<{
   column: Column
 }>()
 
+const emit = defineEmits<{
+  delete: [id: string]
+}>()
+
 const newCardTitle = ref('')
+const isEditing = ref(false)
+const editTitle = ref('')
+
+function startEditing() {
+  editTitle.value = props.column.title
+  isEditing.value = true
+}
+
+function saveEdit() {
+  const title = editTitle.value.trim()
+  if (!title) return
+  props.column.title = title
+  isEditing.value = false
+}
+
+function cancelEdit() {
+  isEditing.value = false
+}
 
 function addCard() {
   const title = newCardTitle.value.trim()
@@ -36,17 +58,27 @@ function deleteCard(id: string) {
 
 <template>
   <div class="kanban-column">
-    <h3>{{ column.title }}</h3>
-    <draggable
-        v-model="column.cards"
-        group="cards"
-        item-key="id"
-        class="cards-list"
-      >
-        <template #item="{ element }">
-          <KanbanCard :card="element" @delete="deleteCard" />
-        </template>
-      </draggable>
+    <button class="delete-btn" @click="emit('delete', column.id)">x</button>
+    <template v-if="isEditing">
+      <input
+        v-model="editTitle"
+        class="edit-input"
+        @keyup.enter="saveEdit"
+        @keyup.escape="cancelEdit"
+      />
+      <div class="edit-actions">
+        <button class="save-btn" @click="saveEdit">Сохранить</button>
+        <button class="cancel-btn" @click="cancelEdit">Отмена</button>
+      </div>
+    </template>
+    <template v-else>
+      <h3 @dblclick="startEditing">{{ column.title }}</h3>
+    </template>
+    <draggable v-model="column.cards" group="cards" item-key="id" class="cards-list">
+      <template #item="{ element }">
+        <KanbanCard :card="element" @delete="deleteCard" />
+      </template>
+    </draggable>
     <div class="add-card">
       <input v-model="newCardTitle" placeholder="Новая задача..." @keyup.enter="addCard" />
       <button @click="addCard">+</button>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Board } from '@/types'
+import type { Board, Column } from '@/types'
 import KanbanColumn from './KanbanColumn.vue'
 import { initialData } from '@/data/initialData'
 import { ref, watch } from 'vue'
@@ -18,7 +18,28 @@ function loadBoard(): Board {
   return structuredClone(initialData)
 }
 
+const newColumnTitle = ref('')
 const board = ref<Board>(loadBoard())
+
+function addColumn() {
+  const title = newColumnTitle.value.trim()
+  if (!title) return
+  const column: Column = {
+    id: `column-${Date.now()}`,
+    title,
+    cards: [],
+  }
+  board.value.columns.push(column)
+  newColumnTitle.value = ''
+}
+
+function deleteColumn(id: string) {
+  const index = board.value.columns.findIndex((e) => e.id === id)
+
+  if (index !== -1) {
+    board.value.columns.splice(index, 1)
+  }
+}
 
 watch(
   board,
@@ -31,7 +52,16 @@ watch(
 
 <template>
   <div class="kanban-board">
-    <KanbanColumn v-for="column in board.columns" :key="column.id" :column="column" />
+    <KanbanColumn
+      v-for="column in board.columns"
+      :key="column.id"
+      :column="column"
+      @delete="deleteColumn"
+    />
+    <div class="add-column">
+      <input v-model="newColumnTitle" placeholder="Новая колонка..." @keyup.enter="addColumn" />
+      <button @click="addColumn">+</button>
+    </div>
   </div>
 </template>
 
