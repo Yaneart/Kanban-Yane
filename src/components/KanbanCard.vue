@@ -31,10 +31,16 @@ function saveEdit() {
 function cancelEdit() {
   isEditing.value = false
 }
+
+function togglePriority() {
+  const priority: Card['priority'][] = ['low', 'medium', 'high']
+  const current = priority.indexOf(props.card.priority)
+  props.card.priority = priority[(current + 1) % 3] ?? 'low'
+}
 </script>
 
 <template>
-  <div class="kanban-card" @dblclick="startEditing">
+  <div class="kanban-card">
     <button class="delete-btn" @click="emit('delete', card.id)">x</button>
 
     <template v-if="isEditing">
@@ -52,8 +58,9 @@ function cancelEdit() {
     </template>
 
     <template v-else>
-      <h4>{{ card.title }}</h4>
+      <h4 @dblclick="startEditing">{{ card.title }}</h4>
       <p>{{ card.description }}</p>
+      <div :class="[`marker`, card.priority]" @click="togglePriority"></div>
     </template>
   </div>
 </template>
@@ -140,5 +147,19 @@ function cancelEdit() {
   border-radius: 4px;
   cursor: pointer;
   font-size: 12px;
+}
+.marker {
+  height: 10px;
+  border-radius: 2px;
+  margin-top: 8px;
+  background-color: green;
+}
+
+.marker.medium {
+  background-color: yellow;
+}
+
+.marker.high {
+  background-color: red;
 }
 </style>

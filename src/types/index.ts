@@ -4,6 +4,7 @@ export interface Card {
   title: string;
   description: string;
   createdAt: number;
+  priority: "high" | "medium" | "low";
 }
 // Колонка с задачами
 export interface Column {

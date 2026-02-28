@@ -41,6 +41,7 @@ function addCard() {
     title,
     description: '',
     createdAt: Date.now(),
+    priority:'low',
   }
 
   props.column.cards.push(card)
