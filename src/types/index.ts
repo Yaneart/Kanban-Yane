@@ -5,6 +5,7 @@ export interface Card {
   description: string;
   createdAt: number;
   priority: "high" | "medium" | "low";
+  deadline?: number
 }
 // Колонка с задачами
 export interface Column {

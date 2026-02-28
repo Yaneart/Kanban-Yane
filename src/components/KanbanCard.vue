@@ -13,10 +13,18 @@ const emit = defineEmits<{
 const isEditing = ref(false)
 const editTitle = ref('')
 const editDiscription = ref('')
+const editDeadline = ref('')
+
+function formaterDate(timestamp: number) {
+  return new Date(timestamp).toLocaleDateString()
+}
 
 function startEditing() {
   editTitle.value = props.card.title
   editDiscription.value = props.card.description
+  editDeadline.value = props.card.deadline
+    ? new Date(props.card.deadline).toISOString().slice(0, 10)
+    : ''
   isEditing.value = true
 }
 
@@ -25,6 +33,7 @@ function saveEdit() {
   if (!title) return
   props.card.title = title
   props.card.description = editDiscription.value.trim()
+  props.card.deadline = editDeadline.value ? new Date(editDeadline.value).getTime() : undefined
   isEditing.value = false
 }
 
@@ -51,6 +60,7 @@ function togglePriority() {
         @keyup.escape="cancelEdit"
       />
       <textarea v-model="editDiscription" class="edit-textarea" @keyup.escape="cancelEdit" />
+      <input v-model="editDeadline" type="date" class="edit-input" />
       <div class="edit-actions">
         <button class="save-btn" @click="saveEdit">Сохранить</button>
         <button class="cancel-btn" @click="cancelEdit">Отмена</button>
@@ -59,8 +69,17 @@ function togglePriority() {
 
     <template v-else>
       <h4>{{ card.title }}</h4>
-      <p v-if="card.description">{{ card.description }}</p>
-      <div :class="['priority-dot', card.priority]" @click.stop="togglePriority" @dblclick.stop></div>
+      <p v-if="card.description">
+        {{ card.description }}
+      </p>
+      <p v-if="card.deadline" :class="{ overdue: card.deadline < Date.now() }" class="deadline">
+        {{ formaterDate(card.deadline) }}
+      </p>
+      <div
+        :class="['priority-dot', card.priority]"
+        @click.stop="togglePriority"
+        @dblclick.stop
+      ></div>
     </template>
   </div>
 </template>
@@ -75,7 +94,9 @@ function togglePriority() {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   border-left: 4px solid;
   cursor: grab;
-  transition: box-shadow 0.2s, transform 0.15s;
+  transition:
+    box-shadow 0.2s,
+    transform 0.15s;
 }
 
 .kanban-card:hover {
@@ -121,7 +142,9 @@ function togglePriority() {
   padding: 2px 6px;
   border-radius: 4px;
   opacity: 0;
-  transition: opacity 0.2s, color 0.2s;
+  transition:
+    opacity 0.2s,
+    color 0.2s;
 }
 
 .kanban-card:hover .delete-btn {
@@ -211,5 +234,16 @@ function togglePriority() {
   color: #9b8ab8;
   cursor: pointer;
   font-size: 12px;
+}
+
+.deadline {
+  font-size: 11px;
+  color: #9b8ab8;
+  margin: 4px 0 0;
+}
+
+.deadline.overdue {
+  color: #eb5a46;
+  font-weight: 600;
 }
 </style>
