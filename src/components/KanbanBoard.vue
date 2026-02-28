@@ -2,6 +2,7 @@
 import type { Board, Column } from '@/types'
 import KanbanColumn from './KanbanColumn.vue'
 import { initialData } from '@/data/initialData'
+import draggable from 'vuedraggable'
 import { ref, watch } from 'vue'
 
 const STORAGE_KEY = 'kanban-board'
@@ -52,12 +53,11 @@ watch(
 
 <template>
   <div class="kanban-board">
-    <KanbanColumn
-      v-for="column in board.columns"
-      :key="column.id"
-      :column="column"
-      @delete="deleteColumn"
-    />
+    <draggable v-model="board.columns" group="column" item-key="id" class="column-list">
+      <template #item="{ element }">
+        <KanbanColumn :key="element.id" :column="element" @delete="deleteColumn" />
+      </template>
+    </draggable>
     <div class="add-column">
       <input v-model="newColumnTitle" placeholder="Новая колонка..." @keyup.enter="addColumn" />
       <button @click="addColumn">+</button>
@@ -73,5 +73,10 @@ watch(
   overflow-x: auto;
   min-height: 100vh;
   background: #e2e8f0;
+}
+
+.column-list {
+  display: flex;
+  gap: 16px;
 }
 </style>
