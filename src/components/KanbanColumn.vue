@@ -72,7 +72,7 @@ function deleteCard(id: string) {
       </div>
     </template>
     <template v-else>
-      <h3 @dblclick="startEditing">{{ column.title }}</h3>
+      <h3 @dblclick="startEditing">{{ column.title }} ({{ column.cards.length }})</h3>
     </template>
     <draggable v-model="column.cards" group="cards" item-key="id" class="cards-list">
       <template #item="{ element }">

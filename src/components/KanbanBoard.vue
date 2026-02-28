@@ -36,10 +36,14 @@ function addColumn() {
 
 function deleteColumn(id: string) {
   const index = board.value.columns.findIndex((e) => e.id === id)
+  if (index === -1) return
 
-  if (index !== -1) {
-    board.value.columns.splice(index, 1)
+  const columns = board.value.columns[index]
+  if (!columns) return
+  if (columns?.cards.length > 0) {
+    if (!window.confirm(`Удалить колонку с ${columns?.cards.length} карточками?`)) return
   }
+  board.value.columns.splice(index, 1)
 }
 
 watch(
