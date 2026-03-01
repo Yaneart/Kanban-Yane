@@ -39,12 +39,17 @@ function deleteColumn(id: string) {
   const index = board.value.columns.findIndex((e) => e.id === id)
   if (index === -1) return
 
-  const columns = board.value.columns[index]
-  if (!columns) return
-  if (columns?.cards.length > 0) {
-    if (!window.confirm(`Удалить колонку с ${columns?.cards.length} карточками?`)) return
+  const column = board.value.columns[index]
+  if (!column) return
+  if (column.cards.length > 0) {
+    if (!window.confirm(`Удалить колонку с ${column.cards.length} карточками?`)) return
   }
   board.value.columns.splice(index, 1)
+}
+
+function resetBoard() {
+  if (!window.confirm('Сбросить доску? Все данные будут потеряны!')) return
+  board.value = structuredClone(initialData)
 }
 
 watch(
@@ -58,7 +63,10 @@ watch(
 
 <template>
   <div class="kanban-board">
-    <input v-model="searchQuery" class="search-input" placeholder="Поиск карточек..." />
+    <div class="board-header">
+      <input v-model="searchQuery" class="search-input" placeholder="Поиск карточек..." />
+      <button class="reset-btn" @click="resetBoard">Сбросить доску</button>
+    </div>
     <div class="board-content">
       <draggable v-model="board.columns" group="column" item-key="id" class="column-list">
         <template #item="{ element }">
@@ -83,7 +91,12 @@ watch(
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: linear-gradient(135deg, var(--bg-gradient-1), var(--bg-gradient-2), var(--bg-gradient-3));
+  background: linear-gradient(
+    135deg,
+    var(--bg-gradient-1),
+    var(--bg-gradient-2),
+    var(--bg-gradient-3)
+  );
   padding: 20px;
 }
 
@@ -95,7 +108,6 @@ watch(
   font-size: 14px;
   background: var(--bg-input-alt);
   color: var(--text-primary);
-  margin-bottom: 20px;
   outline: none;
 }
 
@@ -156,5 +168,28 @@ watch(
 
 .add-column button:hover {
   background: var(--accent-medium);
+}
+
+.board-header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.reset-btn {
+  padding: 10px 16px;
+  background: var(--danger);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+
+.reset-btn:hover {
+  opacity: 0.8;
 }
 </style>
