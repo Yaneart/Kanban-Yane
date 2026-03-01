@@ -121,7 +121,7 @@ function deleteCard(id: string) {
 
 <style scoped>
 .kanban-column {
-  background: #2a2040;
+  background: var(--bg-column);
   border-radius: 12px;
   padding: 12px;
   width: 280px;
@@ -143,25 +143,25 @@ function deleteCard(id: string) {
   margin: 0;
   font-size: 14px;
   font-weight: 700;
-  color: #e8e0f0;
+  color: var(--text-primary);
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 4px;
 }
 
 .column-header h3:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--bg-hover);
 }
 
 .column-header .count {
-  color: #9b8ab8;
+  color: var(--text-secondary);
   font-weight: 400;
 }
 
 .delete-column-btn {
   background: none;
   border: none;
-  color: #9b8ab8;
+  color: var(--text-secondary);
   cursor: pointer;
   font-size: 18px;
   padding: 4px 8px;
@@ -170,8 +170,8 @@ function deleteCard(id: string) {
 }
 
 .delete-column-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: #eb5a46;
+  background: var(--bg-hover);
+  color: var(--danger);
 }
 
 .cards-list {
@@ -185,7 +185,7 @@ function deleteCard(id: string) {
   padding: 6px 8px;
   font-size: 14px;
   font-weight: 700;
-  border: 2px solid #a882ff;
+  border: 2px solid var(--accent);
   border-radius: 4px;
   margin-bottom: 8px;
   box-sizing: border-box;
@@ -200,7 +200,7 @@ function deleteCard(id: string) {
 
 .save-btn {
   padding: 6px 12px;
-  background: #7c5cbf;
+  background: var(--accent-btn);
   color: white;
   border: none;
   border-radius: 4px;
@@ -210,20 +210,20 @@ function deleteCard(id: string) {
 }
 
 .save-btn:hover {
-  background: #9a6ef5;
+  background: var(--accent-btn-hover);
 }
 
 .cancel-btn {
   padding: 6px 12px;
   background: none;
   border: none;
-  color: #9b8ab8;
+  color: var(--text-secondary);
   cursor: pointer;
   font-size: 13px;
 }
 
 .cancel-btn:hover {
-  color: #e8e0f0;
+  color: var(--text-primary);
 }
 
 .add-card {
@@ -239,23 +239,23 @@ function deleteCard(id: string) {
   border: none;
   border-radius: 6px;
   font-size: 14px;
-  background: rgba(255, 255, 255, 0.1);
-  color: #e8e0f0;
+  background: var(--bg-input);
+  color: var(--text-primary);
   outline: none;
 }
 
 .add-card input::placeholder {
-  color: #9b8ab8;
+  color: var(--text-secondary);
 }
 
 .add-card input:focus {
-  box-shadow: 0 0 0 2px rgba(168, 130, 255, 0.4);
-  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+  background: var(--bg-input-focus);
 }
 
 .add-card button {
   padding: 8px 14px;
-  background: #7c5cbf;
+  background: var(--accent-btn);
   color: white;
   border: none;
   border-radius: 6px;
@@ -266,10 +266,10 @@ function deleteCard(id: string) {
 }
 
 .add-card button:hover {
-  background: #9a6ef5;
+  background: var(--accent-btn-hover);
 }
 
 .kanban-column.over-limit {
-  border: 2px solid #eb5a46;
+  border: 2px solid var(--danger);
 }
 </style>

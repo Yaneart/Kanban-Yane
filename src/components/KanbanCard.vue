@@ -87,11 +87,11 @@ function togglePriority() {
 <style scoped>
 .kanban-card {
   position: relative;
-  background: #362b50;
+  background: var(--bg-card);
   border-radius: 8px;
   padding: 8px 12px;
   margin-bottom: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 3px var(--shadow);
   border-left: 4px solid;
   cursor: grab;
   transition:
@@ -100,34 +100,34 @@ function togglePriority() {
 }
 
 .kanban-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 12px var(--shadow-hover);
   transform: translateY(-1px);
-  background: #3d3260;
+  background: var(--bg-card-hover);
 }
 
 .kanban-card.low {
-  border-left-color: #61bd4f;
+  border-left-color: var(--priority-low);
 }
 
 .kanban-card.medium {
-  border-left-color: #f2d600;
+  border-left-color: var(--priority-medium);
 }
 
 .kanban-card.high {
-  border-left-color: #eb5a46;
+  border-left-color: var(--priority-high);
 }
 
 .kanban-card h4 {
   margin: 0 0 4px;
   font-size: 14px;
-  color: #e8e0f0;
+  color: var(--text-primary);
   cursor: pointer;
 }
 
 .kanban-card p {
   margin: 0;
   font-size: 12px;
-  color: #9b8ab8;
+  color: var(--text-secondary);
 }
 
 .delete-btn {
@@ -137,7 +137,7 @@ function togglePriority() {
   background: none;
   border: none;
   font-size: 16px;
-  color: #ccc;
+  color: var(--text-muted);
   cursor: pointer;
   padding: 2px 6px;
   border-radius: 4px;
@@ -152,8 +152,8 @@ function togglePriority() {
 }
 
 .delete-btn:hover {
-  color: #eb5a46;
-  background: rgba(235, 90, 70, 0.1);
+  color: var(--danger);
+  background: var(--danger-bg);
 }
 
 .priority-dot {
@@ -171,15 +171,15 @@ function togglePriority() {
 }
 
 .priority-dot.low {
-  background: #61bd4f;
+  background: var(--priority-low);
 }
 
 .priority-dot.medium {
-  background: #f2d600;
+  background: var(--priority-medium);
 }
 
 .priority-dot.high {
-  background: #eb5a46;
+  background: var(--priority-high);
 }
 
 .edit-input {
@@ -187,7 +187,7 @@ function togglePriority() {
   padding: 4px 8px;
   font-size: 14px;
   font-weight: bold;
-  border: 2px solid #a882ff;
+  border: 2px solid var(--accent);
   border-radius: 4px;
   margin-bottom: 4px;
   box-sizing: border-box;
@@ -198,7 +198,7 @@ function togglePriority() {
   width: 100%;
   padding: 4px 8px;
   font-size: 12px;
-  border: 2px solid #a882ff;
+  border: 2px solid var(--accent);
   border-radius: 4px;
   resize: vertical;
   min-height: 40px;
@@ -214,7 +214,7 @@ function togglePriority() {
 
 .save-btn {
   padding: 4px 12px;
-  background: #7c5cbf;
+  background: var(--accent-btn);
   color: white;
   border: none;
   border-radius: 4px;
@@ -224,26 +224,26 @@ function togglePriority() {
 }
 
 .save-btn:hover {
-  background: #9a6ef5;
+  background: var(--accent-btn-hover);
 }
 
 .cancel-btn {
   padding: 4px 12px;
   background: none;
   border: none;
-  color: #9b8ab8;
+  color: var(--text-secondary);
   cursor: pointer;
   font-size: 12px;
 }
 
 .deadline {
   font-size: 11px;
-  color: #9b8ab8;
+  color: var(--text-secondary);
   margin: 4px 0 0;
 }
 
 .deadline.overdue {
-  color: #eb5a46;
+  color: var(--danger);
   font-weight: 600;
 }
 </style>

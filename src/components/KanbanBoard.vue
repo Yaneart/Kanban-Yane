@@ -83,7 +83,7 @@ watch(
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: linear-gradient(135deg, #1a1033, #2d1b69, #4a2c8a);
+  background: linear-gradient(135deg, var(--bg-gradient-1), var(--bg-gradient-2), var(--bg-gradient-3));
   padding: 20px;
 }
 
@@ -93,19 +93,19 @@ watch(
   border: none;
   border-radius: 8px;
   font-size: 14px;
-  background: rgba(255, 255, 255, 0.12);
-  color: #e8e0f0;
+  background: var(--bg-input-alt);
+  color: var(--text-primary);
   margin-bottom: 20px;
   outline: none;
 }
 
 .search-input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-placeholder);
 }
 
 .search-input:focus {
-  background: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 0 0 2px rgba(168, 130, 255, 0.4);
+  background: var(--bg-input-focus-strong);
+  box-shadow: 0 0 0 2px var(--accent-soft);
 }
 
 .board-content {
@@ -127,7 +127,7 @@ watch(
   flex-direction: column;
   gap: 8px;
   min-width: 280px;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--bg-hover);
   border-radius: 12px;
   padding: 12px;
   flex-shrink: 0;
@@ -138,14 +138,14 @@ watch(
   border: none;
   border-radius: 6px;
   font-size: 14px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--bg-input-solid);
   outline: none;
 }
 
 .add-column button {
   padding: 10px;
-  background: rgba(168, 130, 255, 0.4);
-  color: #e8e0f0;
+  background: var(--accent-soft);
+  color: var(--text-primary);
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -155,6 +155,6 @@ watch(
 }
 
 .add-column button:hover {
-  background: rgba(168, 130, 255, 0.6);
+  background: var(--accent-medium);
 }
 </style>
