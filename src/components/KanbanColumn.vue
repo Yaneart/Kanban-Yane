@@ -77,6 +77,12 @@ function deleteCard(id: string) {
     props.column.cards.splice(index, 1)
   }
 }
+
+function onDragChange(event: any) {
+  if (event.added) {
+    props.addHistory(`Карточка "${event.added.element.title}" перемещена в "${props.column.title}"`)
+  }
+}
 </script>
 
 <template>
@@ -113,7 +119,13 @@ function deleteCard(id: string) {
         <button class="cancel-btn" @click="cancelEdit">Отмена</button>
       </div>
     </template>
-    <draggable :list="filteredCards" group="cards" item-key="id" class="cards-list">
+    <draggable
+      :list="filteredCards"
+      group="cards"
+      item-key="id"
+      class="cards-list"
+      @change="onDragChange"
+    >
       <template #item="{ element }">
         <KanbanCard :card="element" @delete="deleteCard" />
       </template>
