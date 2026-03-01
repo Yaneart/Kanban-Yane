@@ -18,4 +18,10 @@ export interface Column {
 export interface Board {
   columns: Column[];
 }
+//История действий
+export interface HistoryEntry {
+  id: string
+  action: string
+  timestamp: number
+}
 

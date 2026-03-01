@@ -7,6 +7,7 @@ import draggable from 'vuedraggable'
 const props = defineProps<{
   column: Column
   searchQuery: string
+  addHistory: (action: string) => void
 }>()
 
 const emit = defineEmits<{
@@ -40,6 +41,7 @@ function saveEdit() {
   if (!title) return
   props.column.title = title
   props.column.wipLimit = editWipLimit.value || undefined
+  props.addHistory(`Колонка переименована в "${title}"`)
   isEditing.value = false
 }
 
@@ -61,6 +63,7 @@ function addCard() {
   }
 
   props.column.cards.push(card)
+  props.addHistory(`Добавлена карточка "${title}" в "${props.column.title}"`)
   newCardTitle.value = ''
 }
 
@@ -68,6 +71,9 @@ function deleteCard(id: string) {
   const index = props.column.cards.findIndex((c) => c.id === id)
 
   if (index !== -1) {
+    const card = props.column.cards[index]
+    if (!card) return
+    props.addHistory(`Удалена карточка "${card.title}" из "${props.column.title}"`)
     props.column.cards.splice(index, 1)
   }
 }

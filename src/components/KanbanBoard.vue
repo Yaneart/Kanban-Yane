@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Board, Column } from '@/types'
+import type { Board, Column, HistoryEntry } from '@/types'
 import KanbanColumn from './KanbanColumn.vue'
 import { initialData } from '@/data/initialData'
 import draggable from 'vuedraggable'
@@ -19,9 +19,22 @@ function loadBoard(): Board {
   return structuredClone(initialData)
 }
 
+function formatTime(timestamp: number) {
+  return new Date(timestamp).toLocaleTimeString()
+}
+
 const newColumnTitle = ref('')
 const board = ref<Board>(loadBoard())
 const searchQuery = ref('')
+const history = ref<HistoryEntry[]>([])
+
+function addHistory(action: string) {
+  history.value.unshift({
+    id: `history-${Date.now()}`,
+    action,
+    timestamp: Date.now(),
+  })
+}
 
 function addColumn() {
   const title = newColumnTitle.value.trim()
@@ -32,6 +45,7 @@ function addColumn() {
     cards: [],
   }
   board.value.columns.push(column)
+  addHistory(`Добавлена колонка "${title}"`)
   newColumnTitle.value = ''
 }
 
@@ -44,11 +58,13 @@ function deleteColumn(id: string) {
   if (column.cards.length > 0) {
     if (!window.confirm(`Удалить колонку с ${column.cards.length} карточками?`)) return
   }
+  addHistory(`Удалена колонка "${column.title}"`)
   board.value.columns.splice(index, 1)
 }
 
 function resetBoard() {
   if (!window.confirm('Сбросить доску? Все данные будут потеряны!')) return
+  addHistory('Доска сброшена')
   board.value = structuredClone(initialData)
 }
 
@@ -73,6 +89,7 @@ watch(
           <KanbanColumn
             :key="element.id"
             :search-query="searchQuery"
+            :add-history="addHistory"
             :column="element"
             @delete="deleteColumn"
           />
@@ -81,6 +98,15 @@ watch(
       <div class="add-column">
         <input v-model="newColumnTitle" placeholder="Новая колонка..." @keyup.enter="addColumn" />
         <button @click="addColumn">+ Добавить колонку</button>
+      </div>
+      <div class="history-panel">
+        <h3>История действий</h3>
+        <ul>
+          <li v-for="entry in history" :key="entry.id">
+            <span class="history-action">{{ entry.action }}</span>
+            <span class="history-time">{{ formatTime(entry.timestamp) }}</span>
+          </li>
+        </ul>
       </div>
     </div>
   </div>
@@ -191,5 +217,45 @@ watch(
 
 .reset-btn:hover {
   opacity: 0.8;
+}
+
+.history-panel {
+  position: fixed;
+  right: 20px;
+  top: 20px;
+  width: 280px;
+  max-height: 400px;
+  overflow-y: auto;
+  background: var(--bg-column);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.history-panel h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.history-panel ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.history-panel li {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--bg-hover);
+  font-size: 12px;
+}
+
+.history-action {
+  color: var(--text-primary);
+  display: block;
+}
+
+.history-time {
+  color: var(--text-secondary);
+  font-size: 11px;
 }
 </style>
