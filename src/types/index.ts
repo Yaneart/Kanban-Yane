@@ -12,6 +12,7 @@ export interface Column {
   id: string;
   title: string;
   cards: Card[];
+  wipLimit?: number
 }
 // Доска с колонками
 export interface Board {

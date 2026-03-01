@@ -16,6 +16,7 @@ const emit = defineEmits<{
 const newCardTitle = ref('')
 const isEditing = ref(false)
 const editTitle = ref('')
+const editWipLimit = ref(0)
 
 const filteredCards = computed(() => {
   const query = props.searchQuery.toLowerCase().trim()
@@ -23,8 +24,14 @@ const filteredCards = computed(() => {
   return props.column.cards.filter((card) => card.title.toLowerCase().includes(query))
 })
 
+const isOverLimit = computed(() => {
+  if (!props.column.wipLimit) return false
+  return props.column.cards.length >= props.column.wipLimit
+})
+
 function startEditing() {
   editTitle.value = props.column.title
+  editWipLimit.value = props.column.wipLimit ?? 0
   isEditing.value = true
 }
 
@@ -32,6 +39,7 @@ function saveEdit() {
   const title = editTitle.value.trim()
   if (!title) return
   props.column.title = title
+  props.column.wipLimit = editWipLimit.value || undefined
   isEditing.value = false
 }
 
@@ -40,6 +48,7 @@ function cancelEdit() {
 }
 
 function addCard() {
+  if (isOverLimit.value) return
   const title = newCardTitle.value.trim()
   if (!title) return
 
@@ -65,7 +74,7 @@ function deleteCard(id: string) {
 </script>
 
 <template>
-  <div class="kanban-column">
+  <div class="kanban-column" :class="{ 'over-limit': isOverLimit }">
     <div class="column-header">
       <template v-if="isEditing">
         <input
@@ -76,11 +85,23 @@ function deleteCard(id: string) {
         />
       </template>
       <h3 v-else @dblclick="startEditing">
-        {{ column.title }} <span class="count">({{ column.cards.length }})</span>
+        {{ column.title }}
+        <span class="count"
+          >({{ column.cards.length
+          }}<template v-if="column.wipLimit">/ {{ column.wipLimit }}</template
+          >)</span
+        >
       </h3>
       <button class="delete-column-btn" @click="emit('delete', column.id)">&times;</button>
     </div>
     <template v-if="isEditing">
+      <input
+        v-model.number="editWipLimit"
+        type="number"
+        min="0"
+        class="edit-input"
+        placeholder="WIP лимит (0 = без лимита)"
+      />
       <div class="edit-actions">
         <button class="save-btn" @click="saveEdit">Сохранить</button>
         <button class="cancel-btn" @click="cancelEdit">Отмена</button>
@@ -246,5 +267,9 @@ function deleteCard(id: string) {
 
 .add-card button:hover {
   background: #9a6ef5;
+}
+
+.kanban-column.over-limit {
+  border: 2px solid #eb5a46;
 }
 </style>

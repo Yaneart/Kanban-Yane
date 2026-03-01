@@ -12,7 +12,7 @@ const emit = defineEmits<{
 
 const isEditing = ref(false)
 const editTitle = ref('')
-const editDiscription = ref('')
+const editDescription = ref('')
 const editDeadline = ref('')
 
 function formaterDate(timestamp: number) {
@@ -21,7 +21,7 @@ function formaterDate(timestamp: number) {
 
 function startEditing() {
   editTitle.value = props.card.title
-  editDiscription.value = props.card.description
+  editDescription.value = props.card.description
   editDeadline.value = props.card.deadline
     ? new Date(props.card.deadline).toISOString().slice(0, 10)
     : ''
@@ -32,7 +32,7 @@ function saveEdit() {
   const title = editTitle.value.trim()
   if (!title) return
   props.card.title = title
-  props.card.description = editDiscription.value.trim()
+  props.card.description = editDescription.value.trim()
   props.card.deadline = editDeadline.value ? new Date(editDeadline.value).getTime() : undefined
   isEditing.value = false
 }
@@ -59,7 +59,7 @@ function togglePriority() {
         @keyup.enter="saveEdit"
         @keyup.escape="cancelEdit"
       />
-      <textarea v-model="editDiscription" class="edit-textarea" @keyup.escape="cancelEdit" />
+      <textarea v-model="editDescription" class="edit-textarea" @keyup.escape="cancelEdit" />
       <input v-model="editDeadline" type="date" class="edit-input" />
       <div class="edit-actions">
         <button class="save-btn" @click="saveEdit">Сохранить</button>
