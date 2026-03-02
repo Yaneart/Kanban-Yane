@@ -1,46 +1,26 @@
 <script setup lang="ts">
-import type { Board, Column, HistoryEntry } from '@/types'
+import type { Board, Column } from '@/types'
 import KanbanColumn from './KanbanColumn.vue'
 import { initialData } from '@/data/initialData'
 import draggable from 'vuedraggable'
-import { ref, watch } from 'vue'
-
-const STORAGE_KEY = 'kanban-board'
+import { ref } from 'vue'
+import { useLocalStorage } from '@/composables/useLocalStorage'
+import { provideHistory } from '@/composables/useHistory'
 
 defineProps<{
   themeToggler: () => void
   theme: 'dark' | 'light'
 }>()
 
-function loadBoard(): Board {
-  const saved = localStorage.getItem(STORAGE_KEY)
-  if (saved) {
-    try {
-      return JSON.parse(saved) as Board
-    } catch (error) {
-      console.log(error)
-    }
-  }
-  return structuredClone(initialData)
-}
-
 function formatTime(timestamp: number) {
   return new Date(timestamp).toLocaleTimeString()
 }
 
 const newColumnTitle = ref('')
-const board = ref<Board>(loadBoard())
+const board = useLocalStorage<Board>('kanban-board', structuredClone(initialData))
 const searchQuery = ref('')
-const history = ref<HistoryEntry[]>([])
 const showHistory = ref(false)
-
-function addHistory(action: string) {
-  history.value.unshift({
-    id: `history-${Date.now()}`,
-    action,
-    timestamp: Date.now(),
-  })
-}
+const { history, addHistory } = provideHistory()
 
 function addColumn() {
   const title = newColumnTitle.value.trim()
@@ -73,14 +53,6 @@ function resetBoard() {
   addHistory('Доска сброшена')
   board.value = structuredClone(initialData)
 }
-
-watch(
-  board,
-  (value) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(value))
-  },
-  { deep: true },
-)
 </script>
 
 <template>
@@ -112,7 +84,6 @@ watch(
             <KanbanColumn
               :key="element.id"
               :search-query="searchQuery"
-              :add-history="addHistory"
               :column="element"
               @delete="deleteColumn"
             />

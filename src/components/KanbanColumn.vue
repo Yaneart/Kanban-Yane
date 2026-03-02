@@ -3,11 +3,11 @@ import type { Card, Column } from '@/types'
 import KanbanCard from './KanbanCard.vue'
 import { computed, ref } from 'vue'
 import draggable from 'vuedraggable'
+import { useHistory } from '@/composables/useHistory'
 
 const props = defineProps<{
   column: Column
   searchQuery: string
-  addHistory: (action: string) => void
 }>()
 
 const emit = defineEmits<{
@@ -18,6 +18,7 @@ const newCardTitle = ref('')
 const isEditing = ref(false)
 const editTitle = ref('')
 const editWipLimit = ref(0)
+const { addHistory } = useHistory()
 
 const filteredCards = computed(() => {
   const query = props.searchQuery.toLowerCase().trim()
@@ -41,7 +42,7 @@ function saveEdit() {
   if (!title) return
   props.column.title = title
   props.column.wipLimit = editWipLimit.value || undefined
-  props.addHistory(`Колонка переименована в "${title}"`)
+  addHistory(`Колонка переименована в "${title}"`)
   isEditing.value = false
 }
 
@@ -63,7 +64,7 @@ function addCard() {
   }
 
   props.column.cards.push(card)
-  props.addHistory(`Добавлена карточка "${title}" в "${props.column.title}"`)
+  addHistory(`Добавлена карточка "${title}" в "${props.column.title}"`)
   newCardTitle.value = ''
 }
 
@@ -73,14 +74,14 @@ function deleteCard(id: string) {
   if (index !== -1) {
     const card = props.column.cards[index]
     if (!card) return
-    props.addHistory(`Удалена карточка "${card.title}" из "${props.column.title}"`)
+    addHistory(`Удалена карточка "${card.title}" из "${props.column.title}"`)
     props.column.cards.splice(index, 1)
   }
 }
 
 function onDragChange(event: any) {
   if (event.added) {
-    props.addHistory(`Карточка "${event.added.element.title}" перемещена в "${props.column.title}"`)
+    addHistory(`Карточка "${event.added.element.title}" перемещена в "${props.column.title}"`)
   }
 }
 </script>

@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import KanbanBoard from './components/KanbanBoard.vue'
-import { ref, watchEffect } from 'vue'
+import { watchEffect } from 'vue'
+import { useLocalStorage } from './composables/useLocalStorage'
 
-const theme = ref<'light' | 'dark'>(
-  (localStorage.getItem('kanban-theme') as 'dark' | 'light') || 'dark',
-)
+const theme = useLocalStorage<'dark' | 'light'>('kanban-theme', 'dark')
 
 watchEffect(() => {
   document.documentElement.setAttribute('data-theme', theme.value)
-  localStorage.setItem('kanban-theme', theme.value)
 })
 
 function themeToggler() {
