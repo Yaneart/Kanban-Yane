@@ -7,6 +7,11 @@ import { ref, watch } from 'vue'
 
 const STORAGE_KEY = 'kanban-board'
 
+defineProps<{
+  themeToggler: () => void
+  theme: 'dark' | 'light'
+}>()
+
 function loadBoard(): Board {
   const saved = localStorage.getItem(STORAGE_KEY)
   if (saved) {
@@ -87,6 +92,9 @@ watch(
       <div class="header-actions">
         <button class="reset-btn" @click="resetBoard">Сбросить</button>
         <button class="history-toggle" @click="showHistory = !showHistory">История</button>
+        <button class="theme-btn" @click="themeToggler">
+          {{ theme === 'dark' ? '☀️' : '🌙' }}
+        </button>
       </div>
     </header>
 
@@ -223,6 +231,21 @@ watch(
 }
 
 .history-toggle:hover {
+  background: var(--accent-btn-hover);
+}
+
+.theme-btn {
+  padding: 8px 14px;
+  background: var(--accent-btn);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+
+.theme-btn:hover {
   background: var(--accent-btn-hover);
 }
 
