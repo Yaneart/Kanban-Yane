@@ -19,11 +19,24 @@ const isEditing = ref(false)
 const editTitle = ref('')
 const editWipLimit = ref(0)
 const { addHistory } = useHistory()
+const sortMode = ref<'none' | 'priority' | 'date' | 'name'>('none')
 
 const filteredCards = computed(() => {
   const query = props.searchQuery.toLowerCase().trim()
-  if (!query) return props.column.cards
-  return props.column.cards.filter((card) => card.title.toLowerCase().includes(query))
+  let cards = query
+    ? props.column.cards.filter((card) => card.title.toLowerCase().includes(query))
+    : props.column.cards
+
+  if (sortMode.value === 'name') {
+    cards = [...cards].sort((a, b) => a.title.localeCompare(b.title))
+  } else if (sortMode.value === 'date') {
+    cards = [...cards].sort((a, b) => b.createdAt - a.createdAt)
+  } else if (sortMode.value === 'priority') {
+    const order = { high: 0, medium: 1, low: 2 }
+    cards = [...cards].sort((a, b) => order[a.priority] - order[b.priority])
+  }
+
+  return cards
 })
 
 const isOverLimit = computed(() => {
@@ -108,6 +121,12 @@ function onDragChange(event: any) {
       <button class="delete-column-btn" @click="emit('delete', column.id)">&times;</button>
     </div>
     <template v-if="isEditing">
+      <select v-model="sortMode" class="sort-select">
+        <option value="none">Без сортировки</option>
+        <option value="priority">По приоритету</option>
+        <option value="date">По дате</option>
+        <option value="name">По имени</option>
+      </select>
       <input
         v-model.number="editWipLimit"
         type="number"
@@ -291,5 +310,22 @@ function onDragChange(event: any) {
 
 .kanban-column.over-limit {
   border: 2px solid var(--danger);
+}
+
+.sort-select {
+  width: 100%;
+  padding: 6px 8px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  outline: none;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+.sort-select option {
+  background: var(--bg-column);
+  color: var(--text-primary);
 }
 </style>
