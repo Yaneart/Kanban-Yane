@@ -22,6 +22,39 @@ const searchQuery = ref('')
 const showHistory = ref(false)
 const { history, addHistory } = provideHistory()
 
+function exportBoard() {
+  const json = JSON.stringify(board.value, null, 2)
+  const blob = new Blob([json], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'kanban-board.json'
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+function importBoard() {
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = '.json'
+  input.onchange = () => {
+    const file = input.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result as string) as Board
+        board.value = data
+        addHistory('Доска импортирована')
+      } catch {
+        alert('Ошибка: неверный формат файла')
+      }
+    }
+    reader.readAsText(file)
+  }
+  input.click()
+}
+
 function addColumn() {
   const title = newColumnTitle.value.trim()
   if (!title) return
@@ -67,6 +100,8 @@ function resetBoard() {
         <button class="theme-btn" @click="themeToggler">
           {{ theme === 'dark' ? '☀️' : '🌙' }}
         </button>
+        <button class="export-btn" @click="exportBoard">Экспорт</button>
+        <button class="import-btn" @click="importBoard">Импорт</button>
       </div>
     </header>
 
@@ -217,6 +252,36 @@ function resetBoard() {
 }
 
 .theme-btn:hover {
+  background: var(--accent-btn-hover);
+}
+
+.export-btn {
+  padding: 8px 14px;
+  background: var(--accent-btn);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+
+.export-btn:hover {
+  background: var(--accent-btn-hover);
+}
+
+.import-btn {
+  padding: 8px 14px;
+  background: var(--accent-btn);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+
+.import-btn:hover {
   background: var(--accent-btn-hover);
 }
 
