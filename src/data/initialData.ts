@@ -1,26 +1,26 @@
-import type {Board}  from "@/types";
+import type { Board } from '@/types'
 
 export const initialData: Board = {
   columns: [
     {
-      id: "col-1",
-      title: "To Do",
+      id: 'col-1',
+      title: 'To Do',
       cards: [
         {
-          id: "card-1",
-          title: "Изучить Vue 3",
-          description: "Пройти основы Composition API и реактивности",
+          id: 'card-1',
+          title: 'Изучить Vue 3',
+          description: 'Пройти основы Composition API и реактивности',
           createdAt: Date.now(),
-          priority:"low",
+          priority: 'low',
         },
         {
-          id: "card-2",
-          title: "Сделать kanban доску",
-          description: "Написать проект на Vue 3",
+          id: 'card-2',
+          title: 'Сделать kanban доску',
+          description: 'Написать проект на Vue 3',
           createdAt: Date.now(),
-          priority:"low",
+          priority: 'low',
         },
-      ]
+      ],
     },
     {
       id: 'col-2',
@@ -32,5 +32,5 @@ export const initialData: Board = {
       title: 'Done',
       cards: [],
     },
-  ]
-};
+  ],
+}

@@ -93,7 +93,13 @@ watch(
     <!-- Main content -->
     <div class="board-body">
       <div class="board-content">
-        <draggable v-model="board.columns" group="column" item-key="id" class="column-list">
+        <draggable
+          v-model="board.columns"
+          group="column"
+          item-key="id"
+          class="column-list"
+          :animation="200"
+        >
           <template #item="{ element }">
             <KanbanColumn
               :key="element.id"
@@ -111,18 +117,20 @@ watch(
       </div>
 
       <!-- Sidebar -->
-      <aside v-if="showHistory" class="history-panel">
-        <div class="history-header">
-          <h3>История</h3>
-          <button class="close-history" @click="showHistory = false">&times;</button>
-        </div>
-        <ul>
-          <li v-for="entry in history" :key="entry.id">
-            <span class="history-action">{{ entry.action }}</span>
-            <span class="history-time">{{ formatTime(entry.timestamp) }}</span>
-          </li>
-        </ul>
-      </aside>
+      <Transition name="slide">
+        <aside v-if="showHistory" class="history-panel">
+          <div class="history-header">
+            <h3>История</h3>
+            <button class="close-history" @click="showHistory = false">&times;</button>
+          </div>
+          <ul>
+            <li v-for="entry in history" :key="entry.id">
+              <span class="history-action">{{ entry.action }}</span>
+              <span class="history-time">{{ formatTime(entry.timestamp) }}</span>
+            </li>
+          </ul>
+        </aside>
+      </Transition>
     </div>
   </div>
 </template>
@@ -334,6 +342,16 @@ watch(
 .history-time {
   color: var(--text-secondary);
   font-size: 11px;
+}
+
+.slide-enter-active,
+.slide-leave-active {
+  transition: transform 0.3s ease;
+}
+
+.slide-enter-from,
+.slide-leave-to {
+  transform: translateX(100%);
 }
 
 /* ===== Mobile ===== */

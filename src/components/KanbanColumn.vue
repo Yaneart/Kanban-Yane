@@ -124,6 +124,7 @@ function onDragChange(event: any) {
       group="cards"
       item-key="id"
       class="cards-list"
+      :animation="200"
       @change="onDragChange"
     >
       <template #item="{ element }">
