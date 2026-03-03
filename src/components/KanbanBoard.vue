@@ -93,7 +93,8 @@ function resetBoard() {
   <div class="kanban-board">
     <!-- Header -->
     <header class="board-header">
-      <h1 class="board-title">Kanban Board</h1>
+      <RouterLink to="/" class="back-btn">← Назад</RouterLink>
+      <h1 class="board-title">{{ board.title }}</h1>
       <input v-model="searchQuery" class="search-input" placeholder="Поиск карточек..." />
       <div class="header-actions">
         <button class="reset-btn" @click="resetBoard">Сбросить</button>
@@ -412,6 +413,22 @@ function resetBoard() {
 .slide-enter-from,
 .slide-leave-to {
   transform: translateX(100%);
+}
+
+.back-btn {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.back-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
 }
 
 /* ===== Mobile ===== */
