@@ -29,7 +29,7 @@ function startEditing() {
   editDeadline.value = props.card.deadline
     ? new Date(props.card.deadline).toISOString().slice(0, 10)
     : ''
-  editSubTask.value = structuredClone(props.card.subtask ?? [])
+  editSubTask.value = JSON.parse(JSON.stringify(props.card.subtask ?? []))
   isEditing.value = true
 }
 
@@ -101,7 +101,7 @@ function removeSubtask(id: string) {
             class="edit-input"
             @keyup.enter="addSubtask"
           />
-          <button class="save-btn" @click="addSubtask"></button>
+          <button class="save-btn" @click="addSubtask">+</button>
         </div>
       </div>
       <div class="edit-actions">
@@ -123,7 +123,7 @@ function removeSubtask(id: string) {
         @click.stop="togglePriority"
         @dblclick.stop
       ></div>
-      <div v-if="card.subtask?.length" class="subtasks">
+      <div v-if="card.subtask?.length" class="subtasks" @dblclick.stop>
         <span class="subtasks-progress">
           {{ card.subtask.filter((s) => s.done).length }}/{{ card.subtask.length }}
         </span>
@@ -297,5 +297,67 @@ function removeSubtask(id: string) {
 .deadline.overdue {
   color: var(--danger);
   font-weight: 600;
+}
+
+.subtasks {
+  margin-top: 8px;
+  border-top: 1px solid var(--border);
+  padding-top: 6px;
+}
+
+.subtasks-progress {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.subtask-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 2px 0;
+}
+
+.subtask-item .done {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+.subtask-edit {
+  margin-top: 6px;
+}
+
+.subtask-edit-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 0;
+  font-size: 12px;
+  color: var(--text-primary);
+}
+
+.subtask-edit-item button {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.subtask-edit-item button:hover {
+  color: var(--danger);
+}
+
+.subtask-add {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.subtask-add .edit-input {
+  flex: 1;
 }
 </style>
