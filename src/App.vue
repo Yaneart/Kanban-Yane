@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import KanbanBoard from './components/KanbanBoard.vue'
 import { watchEffect } from 'vue'
 import { useLocalStorage } from './composables/useLocalStorage'
 
@@ -15,7 +14,7 @@ function themeToggler() {
 </script>
 
 <template>
-  <KanbanBoard :theme-toggler="themeToggler" :theme="theme" />
+  <RouterView :theme-toggler="themeToggler" :theme="theme" />
 </template>
 
 <style>

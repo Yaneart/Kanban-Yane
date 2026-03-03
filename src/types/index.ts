@@ -17,6 +17,8 @@ export interface Column {
 }
 // Доска с колонками
 export interface Board {
+  id: string
+  title: string
   columns: Column[]
 }
 //История действий

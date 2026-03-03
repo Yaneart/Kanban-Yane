@@ -1,29 +1,30 @@
 <script setup lang="ts">
 import type { Board, Column } from '@/types'
 import KanbanColumn from './KanbanColumn.vue'
-import { initialData } from '@/data/initialData'
 import draggable from 'vuedraggable'
 import { ref } from 'vue'
-import { useLocalStorage } from '@/composables/useLocalStorage'
 import { provideHistory } from '@/composables/useHistory'
 
-defineProps<{
+const props = defineProps<{
+  board: Board
   themeToggler: () => void
   theme: 'dark' | 'light'
 }>()
 
-function formatTime(timestamp: number) {
-  return new Date(timestamp).toLocaleTimeString()
-}
+const emit = defineEmits<{
+  'update:board': [board: Board]
+}>()
 
 const newColumnTitle = ref('')
-const board = useLocalStorage<Board>('kanban-board', structuredClone(initialData))
 const searchQuery = ref('')
 const showHistory = ref(false)
 const { history, addHistory } = provideHistory()
 
+function formatTime(timestamp: number) {
+  return new Date(timestamp).toLocaleTimeString()
+}
 function exportBoard() {
-  const json = JSON.stringify(board.value, null, 2)
+  const json = JSON.stringify(props.board, null, 2)
   const blob = new Blob([json], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
@@ -44,7 +45,7 @@ function importBoard() {
     reader.onload = () => {
       try {
         const data = JSON.parse(reader.result as string) as Board
-        board.value = data
+        emit('update:board', data)
         addHistory('Доска импортирована')
       } catch {
         alert('Ошибка: неверный формат файла')
@@ -63,28 +64,28 @@ function addColumn() {
     title,
     cards: [],
   }
-  board.value.columns.push(column)
+  props.board.columns.push(column)
   addHistory(`Добавлена колонка "${title}"`)
   newColumnTitle.value = ''
 }
 
 function deleteColumn(id: string) {
-  const index = board.value.columns.findIndex((e) => e.id === id)
+  const index = props.board.columns.findIndex((e) => e.id === id)
   if (index === -1) return
 
-  const column = board.value.columns[index]
+  const column = props.board.columns[index]
   if (!column) return
   if (column.cards.length > 0) {
     if (!window.confirm(`Удалить колонку с ${column.cards.length} карточками?`)) return
   }
   addHistory(`Удалена колонка "${column.title}"`)
-  board.value.columns.splice(index, 1)
+  props.board.columns.splice(index, 1)
 }
 
 function resetBoard() {
   if (!window.confirm('Сбросить доску? Все данные будут потеряны!')) return
   addHistory('Доска сброшена')
-  board.value = structuredClone(initialData)
+  emit('update:board', { ...props.board, columns: [] })
 }
 </script>
 

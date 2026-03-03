@@ -1,6 +1,8 @@
 import type { Board } from '@/types'
 
 export const initialData: Board = {
+  id: 'board-1',
+  title: 'Задачи',
   columns: [
     {
       id: 'col-1',
