@@ -54,25 +54,25 @@ function togglePriority() {
 }
 
 function addSubtask() {
-  const newtask = newSubTask.value.trim()
-  if (!newtask) return
+  const newTask = newSubTask.value.trim()
+  if (!newTask) return
 
   const task: SubTask = {
     id: `task-${Date.now()}`,
-    text: newtask,
+    text: newTask,
     done: false,
   }
 
   editSubTask.value.push(task)
-  addHistory(`Добавлена подзадача "${newtask}" в "${props.card.title}"`)
+  addHistory(`Добавлена подзадача "${newTask}" в "${props.card.title}"`)
   newSubTask.value = ''
 }
 
 function removeSubtask(id: string) {
   const deleteTask = editSubTask.value.find((e) => e.id === id)
-  const index = editSubTask.value.filter((c) => c.id !== id)
+  const filtered  = editSubTask.value.filter((c) => c.id !== id)
   addHistory(`Удалена подзадача "${deleteTask?.text}" из "${props.card.title}"`)
-  editSubTask.value = index
+  editSubTask.value = filtered 
 }
 </script>
 
@@ -301,7 +301,7 @@ function removeSubtask(id: string) {
 
 .subtasks {
   margin-top: 8px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--bg-hover);
   padding-top: 6px;
 }
 

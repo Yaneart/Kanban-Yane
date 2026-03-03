@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { useLocalStorage } from '@/composables/useLocalStorage'
+import { useThemeStore } from '@/stores/theme'
 import type { Board } from '@/types'
 import { ref } from 'vue'
 
 const boards = useLocalStorage<Board[]>('kanban-boards', [])
 const newTitle = ref('')
+const themeStore = useThemeStore()
 
 function createBoard() {
   const title = newTitle.value.trim()
@@ -29,6 +31,9 @@ function deleteBoard(id: string) {
   <div class="home">
     <header class="home-header">
       <h1>Мои доски</h1>
+      <button class="theme-btn" @click="themeStore.toggleTheme()">
+        {{ themeStore.theme === 'dark' ? '☀️' : '🌙' }}
+      </button>
     </header>
 
     <div class="boards-grid">
@@ -60,6 +65,9 @@ function deleteBoard(id: string) {
 }
 
 .home-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 32px;
 }
 
@@ -166,6 +174,21 @@ function deleteBoard(id: string) {
 }
 
 .create-card button:hover {
+  background: var(--accent-btn-hover);
+}
+
+.theme-btn {
+  padding: 8px 14px;
+  background: var(--accent-btn);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+
+.theme-btn:hover {
   background: var(--accent-btn-hover);
 }
 </style>
