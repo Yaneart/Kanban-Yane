@@ -1,20 +1,11 @@
 <script setup lang="ts">
-import { watchEffect } from 'vue'
-import { useLocalStorage } from './composables/useLocalStorage'
+import { useThemeStore } from './stores/theme'
 
-const theme = useLocalStorage<'dark' | 'light'>('kanban-theme', 'dark')
-
-watchEffect(() => {
-  document.documentElement.setAttribute('data-theme', theme.value)
-})
-
-function themeToggler() {
-  theme.value = theme.value === 'dark' ? 'light' : 'dark'
-}
+useThemeStore()
 </script>
 
 <template>
-  <RouterView :theme-toggler="themeToggler" :theme="theme" />
+  <RouterView />
 </template>
 
 <style>

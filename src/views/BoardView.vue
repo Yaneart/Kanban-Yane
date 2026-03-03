@@ -5,11 +5,6 @@ import type { Board } from '@/types'
 import { computed } from 'vue'
 import KanbanBoard from '@/components/KanbanBoard.vue'
 
-const props = defineProps<{
-  themeToggler: () => void
-  theme: 'dark' | 'light'
-}>()
-
 const route = useRoute()
 const boards = useLocalStorage<Board[]>('kanban-boards', [])
 
@@ -27,12 +22,7 @@ function updateBoard(newBoard: Board) {
 
 <template>
   <div v-if="board">
-    <KanbanBoard
-      :board="board"
-      :theme-toggler="props.themeToggler"
-      :theme="props.theme"
-      @update:board="updateBoard"
-    />
+    <KanbanBoard :board="board" @update:board="updateBoard" />
   </div>
   <div v-else>
     <h1>Доска не найдена</h1>

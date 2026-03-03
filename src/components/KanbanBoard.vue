@@ -4,11 +4,10 @@ import KanbanColumn from './KanbanColumn.vue'
 import draggable from 'vuedraggable'
 import { ref } from 'vue'
 import { provideHistory } from '@/composables/useHistory'
+import { useThemeStore } from '@/stores/theme'
 
 const props = defineProps<{
   board: Board
-  themeToggler: () => void
-  theme: 'dark' | 'light'
 }>()
 
 const emit = defineEmits<{
@@ -19,6 +18,7 @@ const newColumnTitle = ref('')
 const searchQuery = ref('')
 const showHistory = ref(false)
 const { history, addHistory } = provideHistory()
+const themeStore = useThemeStore()
 
 function formatTime(timestamp: number) {
   return new Date(timestamp).toLocaleTimeString()
@@ -99,8 +99,8 @@ function resetBoard() {
       <div class="header-actions">
         <button class="reset-btn" @click="resetBoard">Сбросить</button>
         <button class="history-toggle" @click="showHistory = !showHistory">История</button>
-        <button class="theme-btn" @click="themeToggler">
-          {{ theme === 'dark' ? '☀️' : '🌙' }}
+        <button class="theme-btn" @click="themeStore.toggleTheme()">
+          {{ themeStore.theme === 'dark' ? '☀️' : '🌙' }}
         </button>
         <button class="export-btn" @click="exportBoard">Экспорт</button>
         <button class="import-btn" @click="importBoard">Импорт</button>
