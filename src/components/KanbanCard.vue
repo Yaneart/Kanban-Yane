@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import type { Card } from '@/types'
+import type { Card, SubTask } from '@/types'
 import { ref } from 'vue'
+import { useHistory } from '@/composables/useHistory'
 
 const props = defineProps<{
   card: Card
@@ -14,6 +15,9 @@ const isEditing = ref(false)
 const editTitle = ref('')
 const editDescription = ref('')
 const editDeadline = ref('')
+const { addHistory } = useHistory()
+const editSubTask = ref<SubTask[]>([])
+const newSubTask = ref('')
 
 function formaterDate(timestamp: number) {
   return new Date(timestamp).toLocaleDateString()
@@ -25,6 +29,7 @@ function startEditing() {
   editDeadline.value = props.card.deadline
     ? new Date(props.card.deadline).toISOString().slice(0, 10)
     : ''
+  editSubTask.value = structuredClone(props.card.subtask ?? [])
   isEditing.value = true
 }
 
@@ -34,6 +39,7 @@ function saveEdit() {
   props.card.title = title
   props.card.description = editDescription.value.trim()
   props.card.deadline = editDeadline.value ? new Date(editDeadline.value).getTime() : undefined
+  props.card.subtask = editSubTask.value
   isEditing.value = false
 }
 
@@ -45,6 +51,28 @@ function togglePriority() {
   const priority: Card['priority'][] = ['low', 'medium', 'high']
   const current = priority.indexOf(props.card.priority)
   props.card.priority = priority[(current + 1) % 3] ?? 'low'
+}
+
+function addSubtask() {
+  const newtask = newSubTask.value.trim()
+  if (!newtask) return
+
+  const task: SubTask = {
+    id: `task-${Date.now()}`,
+    text: newtask,
+    done: false,
+  }
+
+  editSubTask.value.push(task)
+  addHistory(`Добавлена подзадача "${newtask}" в "${props.card.title}"`)
+  newSubTask.value = ''
+}
+
+function removeSubtask(id: string) {
+  const deleteTask = editSubTask.value.find((e) => e.id === id)
+  const index = editSubTask.value.filter((c) => c.id !== id)
+  addHistory(`Удалена подзадача "${deleteTask?.text}" из "${props.card.title}"`)
+  editSubTask.value = index
 }
 </script>
 
@@ -61,6 +89,21 @@ function togglePriority() {
       />
       <textarea v-model="editDescription" class="edit-textarea" @keyup.escape="cancelEdit" />
       <input v-model="editDeadline" type="date" class="edit-input" />
+      <div class="subtask-edit">
+        <div v-for="sub in editSubTask" :key="sub.id" class="subtask-edit-item">
+          <span>{{ sub.text }}</span>
+          <button @click="removeSubtask(sub.id)">&times;</button>
+        </div>
+        <div class="subtask-add">
+          <input
+            v-model="newSubTask"
+            placeholder="Новая подзадача"
+            class="edit-input"
+            @keyup.enter="addSubtask"
+          />
+          <button class="save-btn" @click="addSubtask"></button>
+        </div>
+      </div>
       <div class="edit-actions">
         <button class="save-btn" @click="saveEdit">Сохранить</button>
         <button class="cancel-btn" @click="cancelEdit">Отмена</button>
@@ -80,6 +123,15 @@ function togglePriority() {
         @click.stop="togglePriority"
         @dblclick.stop
       ></div>
+      <div v-if="card.subtask?.length" class="subtasks">
+        <span class="subtasks-progress">
+          {{ card.subtask.filter((s) => s.done).length }}/{{ card.subtask.length }}
+        </span>
+        <label v-for="sub in card.subtask" :key="sub.id" class="subtask-item">
+          <input type="checkbox" v-model="sub.done" @click.stop @dblclick.stop />
+          <span :class="{ done: sub.done }">{{ sub.text }}</span>
+        </label>
+      </div>
     </template>
   </div>
 </template>

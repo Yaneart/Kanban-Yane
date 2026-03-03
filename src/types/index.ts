@@ -6,6 +6,7 @@ export interface Card {
   createdAt: number
   priority: 'high' | 'medium' | 'low'
   deadline?: number
+  subtask?: SubTask[]
 }
 // Колонка с задачами
 export interface Column {
@@ -23,4 +24,10 @@ export interface HistoryEntry {
   id: string
   action: string
   timestamp: number
+}
+//Под таски
+export interface SubTask {
+  id: string
+  text: string
+  done: boolean
 }
