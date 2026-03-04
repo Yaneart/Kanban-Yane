@@ -13,6 +13,16 @@ function formaterDate(timestamp: number) {
 <template>
   <div :class="['kanban-card', card.priority]">
     <h4>{{ card.title }}</h4>
+    <div v-if="card.tags?.length" class="card-tags">
+      <span
+        v-for="tag in card.tags"
+        :key="tag.id"
+        class="card-tag"
+        :style="{ background: tag.color }"
+      >
+        {{ tag.name }}
+      </span>
+    </div>
     <p v-if="card.description">
       {{ card.description }}
     </p>
@@ -132,5 +142,21 @@ function formaterDate(timestamp: number) {
 .subtask-item .done {
   text-decoration: line-through;
   opacity: 0.5;
+}
+
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.card-tag {
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #fff;
+  text-transform: uppercase;
 }
 </style>

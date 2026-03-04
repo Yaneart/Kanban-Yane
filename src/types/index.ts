@@ -7,6 +7,7 @@ export interface Card {
   priority: 'high' | 'medium' | 'low'
   deadline?: number
   subtask?: SubTask[]
+  tags?: Tag[]
 }
 // Колонка с задачами
 export interface Column {
@@ -27,9 +28,15 @@ export interface HistoryEntry {
   action: string
   timestamp: number
 }
-//Под таски
+//Подтаски
 export interface SubTask {
   id: string
   text: string
   done: boolean
+}
+//Метки
+export interface Tag {
+  id: string
+  name: string
+  color: string
 }

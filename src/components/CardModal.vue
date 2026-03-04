@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { Card, SubTask } from '@/types'
+import type { Card, SubTask, Tag } from '@/types'
 import { useHistory } from '@/composables/useHistory'
+import { availableTags } from '@/data/tags'
 
 const props = defineProps<{
   card: Card
@@ -102,6 +103,18 @@ function subtaskProgress(subtask: SubTask[]) {
   const done = subtask.filter((s) => s.done).length
   return `${done}/${subtask.length}`
 }
+
+function toggleTag(tag: Tag) {
+  const currentTag = props.card.tags || []
+  const exists = currentTag.find((s) => s.id === tag.id)
+
+  const newTag = exists ? currentTag.filter((s) => s.id !== tag.id) : [...currentTag, tag]
+  emit('update', { ...props.card, tags: newTag })
+}
+
+function hasTag(tagId: string) {
+  return (props.card.tags || []).some((t) => t.id === tagId)
+}
 </script>
 
 <template>
@@ -116,6 +129,22 @@ function subtaskProgress(subtask: SubTask[]) {
             <h2>{{ card.title }}</h2>
             <span class="priority-badge" :class="card.priority" @click="togglePriority">
               {{ card.priority }}
+            </span>
+          </div>
+          <div class="modal-tags">
+            <span
+              v-for="tag in availableTags"
+              :key="tag.id"
+              class="tag-badge"
+              :class="{ active: hasTag(tag.id) }"
+              :style="
+                hasTag(tag.id)
+                  ? { background: tag.color }
+                  : { borderColor: tag.color, color: tag.color }
+              "
+              @click="toggleTag(tag)"
+            >
+              {{ tag.name }}
             </span>
           </div>
 
@@ -408,5 +437,31 @@ function subtaskProgress(subtask: SubTask[]) {
   background: var(--accent);
   color: #fff;
   cursor: pointer;
+}
+
+.modal-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.tag-badge {
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  background: transparent;
+  opacity: 0.4;
+  transition: opacity 0.2s;
+}
+
+.tag-badge.active {
+  opacity: 1;
+  color: #fff;
+  border-color: transparent;
 }
 </style>
