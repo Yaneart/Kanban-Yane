@@ -8,6 +8,7 @@ export interface Card {
   deadline?: number
   subtask?: SubTask[]
   tags?: Tag[]
+  comments?: Comment[]
 }
 // Колонка с задачами
 export interface Column {
@@ -39,4 +40,10 @@ export interface Tag {
   id: string
   name: string
   color: string
+}
+//Комментарий
+export interface Comment {
+  id: string
+  text: string
+  createdAt: number
 }

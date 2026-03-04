@@ -38,6 +38,7 @@ function formaterDate(timestamp: number) {
         <span :class="{ done: sub.done }">{{ sub.text }}</span>
       </label>
     </div>
+    <span v-if="card.comments?.length" class="comment-count"> 💬 {{ card.comments.length }} </span>
   </div>
 </template>
 
@@ -158,5 +159,12 @@ function formaterDate(timestamp: number) {
   font-weight: 600;
   color: #fff;
   text-transform: uppercase;
+}
+
+.comment-count {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  display: inline-block;
 }
 </style>

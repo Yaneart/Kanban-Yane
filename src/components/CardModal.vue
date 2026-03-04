@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { Card, SubTask, Tag } from '@/types'
+import type { Card, Comment, SubTask, Tag } from '@/types'
 import { useHistory } from '@/composables/useHistory'
 import { availableTags } from '@/data/tags'
 
@@ -23,6 +23,7 @@ const editDescription = ref('')
 const editDeadline = ref('')
 const editSubTask = ref<SubTask[]>([])
 const newSubTask = ref('')
+const newComment = ref('')
 
 function startEditing() {
   editTitle.value = props.card.title
@@ -115,6 +116,28 @@ function toggleTag(tag: Tag) {
 function hasTag(tagId: string) {
   return (props.card.tags || []).some((t) => t.id === tagId)
 }
+
+function addComment() {
+  const text = newComment.value.trim()
+  if (!text) return
+
+  const comment: Comment = {
+    id: crypto.randomUUID(),
+    text,
+    createdAt: Date.now(),
+  }
+
+  const updateComments = [...(props.card.comments || []), comment]
+  emit('update', { ...props.card, comments: updateComments })
+  addHistory(`Комментарий к "${props.card.title}"`)
+  newComment.value = ''
+}
+
+function deleteComment(id: string) {
+  const updatedComments = (props.card.comments || []).filter((t) => t.id !== id)
+  addHistory(`Удален Комментарий`)
+  emit('update', { ...props.card, comments: updatedComments })
+}
 </script>
 
 <template>
@@ -167,6 +190,26 @@ function hasTag(tagId: string) {
               <input type="checkbox" :checked="st.done" @change="toggleSubtask(st)" />
               <span :class="{ done: st.done }">{{ st.text }}</span>
             </label>
+          </div>
+
+          <div class="modal-comments">
+            <h3>Comments {{ card.comments?.length ? `(${card.comments.length})` : '' }}</h3>
+            <div v-for="c in card.comments" :key="c.id" class="comment-item">
+              <div class="comment-header">
+                <span class="comment-time">{{ formaterDate(c.createdAt) }}</span>
+                <button class="comment-delete" @click="deleteComment(c.id)">✕</button>
+              </div>
+              <p class="comment-text">{{ c.text }}</p>
+            </div>
+            <div class="comment-add">
+              <textarea
+                v-model="newComment"
+                placeholder="Write a comment..."
+                rows="2"
+                @keydown.ctrl.enter="addComment"
+              />
+              <button @click="addComment">Send</button>
+            </div>
           </div>
 
           <div class="modal-meta">Created: {{ formaterDate(card.createdAt) }}</div>
@@ -463,5 +506,76 @@ function hasTag(tagId: string) {
   opacity: 1;
   color: #fff;
   border-color: transparent;
+}
+
+.modal-comments {
+  margin-bottom: 16px;
+}
+
+.modal-comments h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.comment-item {
+  padding: 8px;
+  background: var(--bg-input);
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.comment-time {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.comment-delete {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.comment-delete:hover {
+  color: var(--priority-high);
+}
+
+.comment-text {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.comment-add textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--bg-hover);
+  border-radius: 8px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  resize: vertical;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.comment-add button {
+  margin-top: 6px;
+  padding: 6px 16px;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
 }
 </style>
