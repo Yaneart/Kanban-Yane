@@ -2,7 +2,7 @@
 import type { Board, Column } from '@/types'
 import KanbanColumn from './KanbanColumn.vue'
 import draggable from 'vuedraggable'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { provideHistory } from '@/composables/useHistory'
 import { useThemeStore } from '@/stores/theme'
 
@@ -19,6 +19,7 @@ const searchQuery = ref('')
 const showHistory = ref(false)
 const { history, addHistory } = provideHistory()
 const themeStore = useThemeStore()
+const showArchive = ref(false)
 
 function formatTime(timestamp: number) {
   return new Date(timestamp).toLocaleTimeString()
@@ -87,6 +88,29 @@ function resetBoard() {
   addHistory('Доска сброшена')
   emit('update:board', { ...props.board, columns: [] })
 }
+
+const archivedCards = computed(() => {
+  return props.board.columns.flatMap((col) =>
+    col.cards
+      .filter((card) => card.archived)
+      .map((card) => ({
+        ...card,
+        columnTitle: col.title,
+        columnId: col.id,
+      })),
+  )
+})
+
+function restoreCard(columnId: string, cardId: string) {
+  const column = props.board.columns.find((c) => c.id === columnId)
+  if (!column) return
+
+  const card = column.cards.find((c) => c.id === cardId)
+  if (!card) return
+
+  card.archived = false
+  addHistory(`Восстановлена карточка "${card.title}"`)
+}
 </script>
 
 <template>
@@ -99,6 +123,7 @@ function resetBoard() {
       <div class="header-actions">
         <button class="reset-btn" @click="resetBoard">Сбросить</button>
         <button class="history-toggle" @click="showHistory = !showHistory">История</button>
+        <button class="history-toggle" @click="showArchive = !showArchive">Архив</button>
         <button class="theme-btn" @click="themeStore.toggleTheme()">
           {{ themeStore.theme === 'dark' ? '☀️' : '🌙' }}
         </button>
@@ -145,6 +170,24 @@ function resetBoard() {
               <span class="history-time">{{ formatTime(entry.timestamp) }}</span>
             </li>
           </ul>
+        </aside>
+      </Transition>
+      <Transition name="slide">
+        <aside v-if="showArchive" class="history-panel">
+          <div class="history-header">
+            <h3>Архив</h3>
+            <button class="close-history" @click="showArchive = false">&times;</button>
+          </div>
+          <p v-if="!archivedCards.length" style="color: var(--text-secondary); font-size: 13px">
+            Пусто
+          </p>
+          <div v-for="card in archivedCards" :key="card.id" class="archive-item">
+            <div class="archive-card-info">
+              <span class="archive-card-title">{{ card.title }}</span>
+              <span class="archive-card-column">{{ card.columnTitle }}</span>
+            </div>
+            <button class="restore-btn" @click="restoreCard(card.columnId, card.id)">↩</button>
+          </div>
         </aside>
       </Transition>
     </div>
@@ -429,6 +472,44 @@ function resetBoard() {
 .back-btn:hover {
   background: var(--bg-hover);
   color: var(--text-primary);
+}
+
+.archive-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--bg-hover);
+}
+
+.archive-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.archive-card-title {
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.archive-card-column {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.restore-btn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.restore-btn:hover {
+  background: var(--bg-hover);
 }
 
 /* ===== Mobile ===== */

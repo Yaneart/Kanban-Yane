@@ -138,6 +138,12 @@ function deleteComment(id: string) {
   addHistory(`Удален Комментарий`)
   emit('update', { ...props.card, comments: updatedComments })
 }
+
+function archivedCard() {
+  emit('update', { ...props.card, archived: true })
+  addHistory(`Архивирована карточка "${props.card.title}"`)
+  emit('close')
+}
 </script>
 
 <template>
@@ -216,6 +222,7 @@ function deleteComment(id: string) {
 
           <div class="modal-actions">
             <button class="btn-edit" @click="startEditing">Edit</button>
+            <button class="btn-archive" @click="archivedCard">Archived</button>
             <button class="btn-delete" @click="emit('delete', card.id)">Delete</button>
           </div>
         </div>
@@ -577,5 +584,15 @@ function deleteComment(id: string) {
   cursor: pointer;
   font-weight: 600;
   font-size: 0.85rem;
+}
+
+.btn-archive {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent-btn);
+  color: #fff;
+  cursor: pointer;
+  font-weight: 600;
 }
 </style>

@@ -9,6 +9,7 @@ export interface Card {
   subtask?: SubTask[]
   tags?: Tag[]
   comments?: Comment[]
+  archived?: boolean
 }
 // Колонка с задачами
 export interface Column {

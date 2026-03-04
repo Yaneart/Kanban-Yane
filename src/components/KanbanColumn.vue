@@ -25,9 +25,11 @@ const selectedCard = ref<Card | null>(null)
 
 const filteredCards = computed(() => {
   const query = props.searchQuery.toLowerCase().trim()
-  let cards = query
-    ? props.column.cards.filter((card) => card.title.toLowerCase().includes(query))
-    : props.column.cards
+  let cards = props.column.cards.filter((t) => !t.archived)
+
+  if (query) {
+    cards = cards.filter((card) => card.title.toLowerCase().includes(query))
+  }
 
   if (sortMode.value === 'name') {
     cards = [...cards].sort((a, b) => a.title.localeCompare(b.title))
