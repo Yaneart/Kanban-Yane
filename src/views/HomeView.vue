@@ -31,7 +31,7 @@ function deleteBoard(id: string) {
   <div class="home">
     <header class="home-header">
       <h1>Мои доски</h1>
-      <button class="theme-btn" @click="themeStore.toggleTheme()">
+      <button class="btn btn-primary" @click="themeStore.toggleTheme()">
         {{ themeStore.theme === 'dark' ? '☀️' : '🌙' }}
       </button>
     </header>
@@ -41,12 +41,12 @@ function deleteBoard(id: string) {
         <RouterLink :to="'/board/' + board.id" class="board-link">
           {{ board.title }}
         </RouterLink>
-        <button class="board-delete" @click="deleteBoard(board.id)">&times;</button>
+        <button class="board-delete" @click="deleteBoard(board.id)">✕</button>
       </div>
 
       <div class="board-card create-card">
-        <input v-model="newTitle" placeholder="Название доски..." @keyup.enter="createBoard" />
-        <button @click="createBoard">+ Создать</button>
+        <input v-model="newTitle" class="input" placeholder="Название доски..." @keyup.enter="createBoard" />
+        <button class="btn btn-primary" @click="createBoard">+ Создать</button>
       </div>
     </div>
   </div>
@@ -147,48 +147,6 @@ function deleteBoard(id: string) {
 
 .create-card input {
   width: 100%;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  background: var(--bg-input);
-  color: var(--text-primary);
-  outline: none;
   text-align: center;
-}
-
-.create-card input::placeholder {
-  color: var(--text-placeholder);
-}
-
-.create-card button {
-  padding: 8px 16px;
-  background: var(--accent-btn);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  transition: background 0.2s;
-}
-
-.create-card button:hover {
-  background: var(--accent-btn-hover);
-}
-
-.theme-btn {
-  padding: 8px 14px;
-  background: var(--accent-btn);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background 0.2s;
-}
-
-.theme-btn:hover {
-  background: var(--accent-btn-hover);
 }
 </style>

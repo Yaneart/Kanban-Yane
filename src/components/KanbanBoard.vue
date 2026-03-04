@@ -119,16 +119,16 @@ function restoreCard(columnId: string, cardId: string) {
     <header class="board-header">
       <RouterLink to="/" class="back-btn">← Назад</RouterLink>
       <h1 class="board-title">{{ board.title }}</h1>
-      <input v-model="searchQuery" class="search-input" placeholder="Поиск карточек..." />
+      <input v-model="searchQuery" class="input search-input" placeholder="Поиск карточек..." />
       <div class="header-actions">
-        <button class="reset-btn" @click="resetBoard">Сбросить</button>
-        <button class="history-toggle" @click="showHistory = !showHistory">История</button>
-        <button class="history-toggle" @click="showArchive = !showArchive">Архив</button>
-        <button class="theme-btn" @click="themeStore.toggleTheme()">
+        <button class="btn btn-danger" @click="resetBoard">Сбросить</button>
+        <button class="btn btn-primary" @click="showHistory = !showHistory">История</button>
+        <button class="btn btn-primary" @click="showArchive = !showArchive">Архив</button>
+        <button class="btn btn-primary" @click="themeStore.toggleTheme()">
           {{ themeStore.theme === 'dark' ? '☀️' : '🌙' }}
         </button>
-        <button class="export-btn" @click="exportBoard">Экспорт</button>
-        <button class="import-btn" @click="importBoard">Импорт</button>
+        <button class="btn btn-primary" @click="exportBoard">Экспорт</button>
+        <button class="btn btn-primary" @click="importBoard">Импорт</button>
       </div>
     </header>
 
@@ -162,7 +162,7 @@ function restoreCard(columnId: string, cardId: string) {
         <aside v-if="showHistory" class="history-panel">
           <div class="history-header">
             <h3>История</h3>
-            <button class="close-history" @click="showHistory = false">&times;</button>
+            <button class="btn-icon" @click="showHistory = false">✕</button>
           </div>
           <ul>
             <li v-for="entry in history" :key="entry.id">
@@ -176,7 +176,7 @@ function restoreCard(columnId: string, cardId: string) {
         <aside v-if="showArchive" class="history-panel">
           <div class="history-header">
             <h3>Архив</h3>
-            <button class="close-history" @click="showArchive = false">&times;</button>
+            <button class="btn-icon" @click="showArchive = false">✕</button>
           </div>
           <p v-if="!archivedCards.length" style="color: var(--text-secondary); font-size: 13px">
             Пусто
@@ -186,7 +186,7 @@ function restoreCard(columnId: string, cardId: string) {
               <span class="archive-card-title">{{ card.title }}</span>
               <span class="archive-card-column">{{ card.columnTitle }}</span>
             </div>
-            <button class="restore-btn" @click="restoreCard(card.columnId, card.id)">↩</button>
+            <button class="btn-icon restore-btn" @click="restoreCard(card.columnId, card.id)">↩</button>
           </div>
         </aside>
       </Transition>
@@ -229,22 +229,11 @@ function restoreCard(columnId: string, cardId: string) {
 .search-input {
   flex: 1;
   max-width: 300px;
-  padding: 8px 14px;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
   background: var(--bg-input-alt);
-  color: var(--text-primary);
-  outline: none;
-}
-
-.search-input::placeholder {
-  color: var(--text-placeholder);
 }
 
 .search-input:focus {
   background: var(--bg-input-focus-strong);
-  box-shadow: 0 0 0 2px var(--accent-soft);
 }
 
 .header-actions {
@@ -253,82 +242,6 @@ function restoreCard(columnId: string, cardId: string) {
   margin-left: auto;
 }
 
-.reset-btn {
-  padding: 8px 14px;
-  background: var(--danger);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 600;
-  transition: opacity 0.2s;
-}
-
-.reset-btn:hover {
-  opacity: 0.8;
-}
-
-.history-toggle {
-  padding: 8px 14px;
-  background: var(--accent-btn);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 600;
-  transition: background 0.2s;
-}
-
-.history-toggle:hover {
-  background: var(--accent-btn-hover);
-}
-
-.theme-btn {
-  padding: 8px 14px;
-  background: var(--accent-btn);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background 0.2s;
-}
-
-.theme-btn:hover {
-  background: var(--accent-btn-hover);
-}
-
-.export-btn {
-  padding: 8px 14px;
-  background: var(--accent-btn);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background 0.2s;
-}
-
-.export-btn:hover {
-  background: var(--accent-btn-hover);
-}
-
-.import-btn {
-  padding: 8px 14px;
-  background: var(--accent-btn);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background 0.2s;
-}
-
-.import-btn:hover {
-  background: var(--accent-btn-hover);
-}
 
 /* ===== Body ===== */
 .board-body {
@@ -411,21 +324,6 @@ function restoreCard(columnId: string, cardId: string) {
   color: var(--text-primary);
 }
 
-.close-history {
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 18px;
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 4px;
-}
-
-.close-history:hover {
-  color: var(--text-primary);
-  background: var(--bg-hover);
-}
-
 .history-panel ul {
   list-style: none;
   padding: 0;
@@ -499,17 +397,7 @@ function restoreCard(columnId: string, cardId: string) {
 }
 
 .restore-btn {
-  background: none;
-  border: none;
   color: var(--accent);
-  cursor: pointer;
-  font-size: 18px;
-  padding: 4px 8px;
-  border-radius: 4px;
-}
-
-.restore-btn:hover {
-  background: var(--bg-hover);
 }
 
 /* ===== Mobile ===== */

@@ -139,7 +139,7 @@ function deleteCardFromModal(id: string) {
           >)</span
         >
       </h3>
-      <button class="delete-column-btn" @click="emit('delete', column.id)">&times;</button>
+      <button class="btn-icon delete-column-btn" @click="emit('delete', column.id)">✕</button>
     </div>
     <template v-if="isEditing">
       <select v-model="sortMode" class="sort-select">
@@ -156,8 +156,8 @@ function deleteCardFromModal(id: string) {
         placeholder="WIP лимит (0 = без лимита)"
       />
       <div class="edit-actions">
-        <button class="save-btn" @click="saveEdit">Сохранить</button>
-        <button class="cancel-btn" @click="cancelEdit">Отмена</button>
+        <button class="btn btn-primary btn-sm" @click="saveEdit">Сохранить</button>
+        <button class="btn btn-ghost btn-sm" @click="cancelEdit">Отмена</button>
       </div>
     </template>
     <draggable
@@ -225,19 +225,7 @@ function deleteCardFromModal(id: string) {
   font-weight: 400;
 }
 
-.delete-column-btn {
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  font-size: 18px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  line-height: 1;
-}
-
 .delete-column-btn:hover {
-  background: var(--bg-hover);
   color: var(--danger);
 }
 
@@ -263,34 +251,6 @@ function deleteCardFromModal(id: string) {
   display: flex;
   gap: 6px;
   margin-bottom: 8px;
-}
-
-.save-btn {
-  padding: 6px 12px;
-  background: var(--accent-btn);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.save-btn:hover {
-  background: var(--accent-btn-hover);
-}
-
-.cancel-btn {
-  padding: 6px 12px;
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  font-size: 13px;
-}
-
-.cancel-btn:hover {
-  color: var(--text-primary);
 }
 
 .add-card {

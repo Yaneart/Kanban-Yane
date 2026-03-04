@@ -16,6 +16,12 @@ const emit = defineEmits<{
 
 const { addHistory } = useHistory()
 
+const priorityLabels: Record<Card['priority'], string> = {
+  low: 'Низкий',
+  medium: 'Средний',
+  high: 'Высокий',
+}
+
 const isEditing = ref(false)
 
 const editTitle = ref('')
@@ -150,21 +156,21 @@ function archivedCard() {
   <Teleport to="body">
     <div class="modal-overlay" @click.self="emit('close')">
       <div class="modal-content">
-        <button class="modal-close" @click="emit('close')">✕</button>
+        <button class="btn-icon modal-close" @click="emit('close')">✕</button>
 
         <!-- Просмотр -->
         <div v-if="!isEditing" class="modal-view">
           <div class="modal-header">
             <h2>{{ card.title }}</h2>
-            <span class="priority-badge" :class="card.priority" @click="togglePriority">
-              {{ card.priority }}
+            <span class="badge priority-badge" :class="card.priority" @click="togglePriority">
+              {{ priorityLabels[card.priority] }}
             </span>
           </div>
           <div class="modal-tags">
             <span
               v-for="tag in availableTags"
               :key="tag.id"
-              class="tag-badge"
+              class="badge tag-badge"
               :class="{ active: hasTag(tag.id) }"
               :style="
                 hasTag(tag.id)
@@ -180,18 +186,18 @@ function archivedCard() {
           <p v-if="card.description" class="modal-description">
             {{ card.description }}
           </p>
-          <p v-else class="modal-description empty">No description</p>
+          <p v-else class="modal-description empty">Нет описания</p>
 
           <div
             v-if="card.deadline"
             class="modal-deadline"
             :class="{ overdue: isOverdue(card.deadline) }"
           >
-            Deadline: {{ formaterDate(card.deadline) }}
+            Дедлайн: {{ formaterDate(card.deadline) }}
           </div>
 
           <div v-if="card.subtask?.length" class="modal-subtasks">
-            <h3>Subtasks {{ subtaskProgress(card.subtask) }}</h3>
+            <h3>Подзадачи {{ subtaskProgress(card.subtask) }}</h3>
             <label v-for="st in card.subtask" :key="st.id" class="subtask-item">
               <input type="checkbox" :checked="st.done" @change="toggleSubtask(st)" />
               <span :class="{ done: st.done }">{{ st.text }}</span>
@@ -199,66 +205,67 @@ function archivedCard() {
           </div>
 
           <div class="modal-comments">
-            <h3>Comments {{ card.comments?.length ? `(${card.comments.length})` : '' }}</h3>
+            <h3>Комментарии {{ card.comments?.length ? `(${card.comments.length})` : '' }}</h3>
             <div v-for="c in card.comments" :key="c.id" class="comment-item">
               <div class="comment-header">
                 <span class="comment-time">{{ formaterDate(c.createdAt) }}</span>
-                <button class="comment-delete" @click="deleteComment(c.id)">✕</button>
+                <button class="btn-icon comment-delete" @click="deleteComment(c.id)">✕</button>
               </div>
               <p class="comment-text">{{ c.text }}</p>
             </div>
             <div class="comment-add">
               <textarea
                 v-model="newComment"
-                placeholder="Write a comment..."
+                class="textarea"
+                placeholder="Написать комментарий..."
                 rows="2"
                 @keydown.ctrl.enter="addComment"
               />
-              <button @click="addComment">Send</button>
+              <button class="btn btn-accent btn-sm" @click="addComment">Отправить</button>
             </div>
           </div>
 
-          <div class="modal-meta">Created: {{ formaterDate(card.createdAt) }}</div>
+          <div class="modal-meta">Создано: {{ formaterDate(card.createdAt) }}</div>
 
           <div class="modal-actions">
-            <button class="btn-edit" @click="startEditing">Edit</button>
-            <button class="btn-archive" @click="archivedCard">Archived</button>
-            <button class="btn-delete" @click="emit('delete', card.id)">Delete</button>
+            <button class="btn btn-accent" @click="startEditing">Редактировать</button>
+            <button class="btn btn-primary" @click="archivedCard">Архив</button>
+            <button class="btn btn-danger" @click="emit('delete', card.id)">Удалить</button>
           </div>
         </div>
 
         <!-- Редактирование -->
         <div v-else class="modal-edit">
           <div class="edit-field">
-            <label>Title</label>
-            <input v-model="editTitle" @keyup.enter="saveEdit" @keyup.escape="cancelEdit" />
+            <label>Название</label>
+            <input class="input input-bordered" v-model="editTitle" @keyup.enter="saveEdit" @keyup.escape="cancelEdit" />
           </div>
 
           <div class="edit-field">
-            <label>Description</label>
-            <textarea v-model="editDescription" rows="3" />
+            <label>Описание</label>
+            <textarea v-model="editDescription" class="textarea" rows="3" />
           </div>
 
           <div class="edit-field">
-            <label>Deadline</label>
-            <input type="date" v-model="editDeadline" />
+            <label>Дедлайн</label>
+            <input type="date" class="input input-bordered" v-model="editDeadline" />
           </div>
 
           <div class="edit-field">
-            <label>Subtasks</label>
+            <label>Подзадачи</label>
             <div v-for="st in editSubTask" :key="st.id" class="edit-subtask">
               <span>{{ st.text }}</span>
               <button @click="removeSubtask(st.id)">✕</button>
             </div>
             <div class="add-subtask">
-              <input v-model="newSubTask" placeholder="New subtask..." @keyup.enter="addSubtask" />
-              <button @click="addSubtask">+</button>
+              <input v-model="newSubTask" class="input" placeholder="Новая подзадача..." @keyup.enter="addSubtask" />
+              <button class="btn btn-accent btn-sm" @click="addSubtask">+</button>
             </div>
           </div>
 
           <div class="modal-actions">
-            <button class="btn-save" @click="saveEdit">Save</button>
-            <button class="btn-cancel" @click="cancelEdit">Cancel</button>
+            <button class="btn btn-accent" @click="saveEdit">Сохранить</button>
+            <button class="btn btn-ghost" @click="cancelEdit">Отмена</button>
           </div>
         </div>
       </div>
@@ -295,15 +302,6 @@ function archivedCard() {
   position: absolute;
   top: 12px;
   right: 12px;
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 18px;
-  cursor: pointer;
-}
-
-.modal-close:hover {
-  color: var(--text-primary);
 }
 
 .modal-header {
@@ -320,11 +318,7 @@ function archivedCard() {
 
 .priority-badge {
   padding: 4px 10px;
-  border-radius: 12px;
   font-size: 0.75rem;
-  text-transform: uppercase;
-  cursor: pointer;
-  font-weight: 600;
 }
 
 .priority-badge.low {
@@ -396,36 +390,6 @@ function archivedCard() {
   gap: 8px;
 }
 
-.btn-edit,
-.btn-save {
-  padding: 8px 20px;
-  border: none;
-  border-radius: 8px;
-  background: var(--accent);
-  color: #fff;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.btn-delete {
-  padding: 8px 20px;
-  border: none;
-  border-radius: 8px;
-  background: var(--priority-high);
-  color: #fff;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.btn-cancel {
-  padding: 8px 20px;
-  border: none;
-  border-radius: 8px;
-  background: var(--bg-hover);
-  color: var(--text-primary);
-  cursor: pointer;
-}
-
 /* Edit mode */
 .edit-field {
   margin-bottom: 16px;
@@ -442,13 +406,6 @@ function archivedCard() {
 .edit-field input,
 .edit-field textarea {
   width: 100%;
-  padding: 8px 12px;
-  border: 1px solid var(--bg-hover);
-  border-radius: 8px;
-  background: var(--bg-input);
-  color: var(--text-primary);
-  font-size: 0.9rem;
-  box-sizing: border-box;
 }
 
 .edit-subtask {
@@ -473,20 +430,6 @@ function archivedCard() {
 
 .add-subtask input {
   flex: 1;
-  padding: 6px 10px;
-  border: 1px solid var(--bg-hover);
-  border-radius: 8px;
-  background: var(--bg-input);
-  color: var(--text-primary);
-}
-
-.add-subtask button {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 8px;
-  background: var(--accent);
-  color: #fff;
-  cursor: pointer;
 }
 
 .modal-tags {
@@ -497,12 +440,6 @@ function archivedCard() {
 }
 
 .tag-badge {
-  padding: 3px 10px;
-  border-radius: 12px;
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  cursor: pointer;
   border: 1.5px solid transparent;
   background: transparent;
   opacity: 0.4;
@@ -544,10 +481,6 @@ function archivedCard() {
 }
 
 .comment-delete {
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
   font-size: 14px;
 }
 
@@ -563,36 +496,10 @@ function archivedCard() {
 
 .comment-add textarea {
   width: 100%;
-  padding: 8px 12px;
-  border: 1px solid var(--bg-hover);
-  border-radius: 8px;
-  background: var(--bg-input);
-  color: var(--text-primary);
-  font-size: 0.85rem;
-  resize: vertical;
-  box-sizing: border-box;
-  font-family: inherit;
 }
 
 .comment-add button {
   margin-top: 6px;
-  padding: 6px 16px;
-  border: none;
-  border-radius: 8px;
-  background: var(--accent);
-  color: #fff;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 0.85rem;
 }
 
-.btn-archive {
-  padding: 8px 20px;
-  border: none;
-  border-radius: 8px;
-  background: var(--accent-btn);
-  color: #fff;
-  cursor: pointer;
-  font-weight: 600;
-}
 </style>

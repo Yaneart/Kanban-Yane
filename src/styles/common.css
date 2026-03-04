@@ -1,0 +1,120 @@
+/* ===== Buttons ===== */
+.btn {
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.btn-primary {
+  padding: 8px 16px;
+  background: var(--accent-btn);
+  color: #fff;
+  font-size: 13px;
+}
+
+.btn-primary:hover {
+  background: var(--accent-btn-hover);
+}
+
+.btn-accent {
+  padding: 8px 20px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 14px;
+  border-radius: 8px;
+}
+
+.btn-danger {
+  padding: 8px 16px;
+  background: var(--priority-high);
+  color: #fff;
+  font-size: 13px;
+}
+
+.btn-danger:hover {
+  opacity: 0.8;
+}
+
+.btn-ghost {
+  padding: 8px 16px;
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.btn-ghost:hover {
+  opacity: 0.8;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.btn-icon:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+/* ===== Inputs ===== */
+.input {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.input::placeholder {
+  color: var(--text-placeholder);
+}
+
+.input:focus {
+  box-shadow: 0 0 0 2px var(--accent-soft);
+  background: var(--bg-input-focus);
+}
+
+.input-bordered {
+  border: 1px solid var(--bg-hover);
+  border-radius: 8px;
+  background: var(--bg-input);
+}
+
+.textarea {
+  padding: 8px 12px;
+  border: 1px solid var(--bg-hover);
+  border-radius: 8px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+/* ===== Badges ===== */
+.badge {
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+}
