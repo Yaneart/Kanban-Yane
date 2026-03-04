@@ -4,6 +4,7 @@ import KanbanCard from './KanbanCard.vue'
 import { computed, ref } from 'vue'
 import draggable from 'vuedraggable'
 import { useHistory } from '@/composables/useHistory'
+import CardModal from './CardModal.vue'
 
 const props = defineProps<{
   column: Column
@@ -20,6 +21,7 @@ const editTitle = ref('')
 const editWipLimit = ref(0)
 const { addHistory } = useHistory()
 const sortMode = ref<'none' | 'priority' | 'date' | 'name'>('none')
+const selectedCard = ref<Card | null>(null)
 
 const filteredCards = computed(() => {
   const query = props.searchQuery.toLowerCase().trim()
@@ -97,6 +99,23 @@ function onDragChange(event: any) {
     addHistory(`Карточка "${event.added.element.title}" перемещена в "${props.column.title}"`)
   }
 }
+
+function updateCard(updatedCard: Card) {
+  const index = props.column.cards.findIndex((c) => c.id === updatedCard.id)
+  if (index !== -1) {
+    props.column.cards[index] = updatedCard
+  }
+  selectedCard.value = updatedCard
+}
+
+function deleteCardFromModal(id: string) {
+  const card = props.column.cards.find((c) => c.id === id)
+  if (card) {
+    addHistory(`Удалена карточка "${card.title}" из "${props.column.title}"`)
+    props.column.cards = props.column.cards.filter((c) => c.id !== id)
+  }
+  selectedCard.value = null
+}
 </script>
 
 <template>
@@ -148,13 +167,20 @@ function onDragChange(event: any) {
       @change="onDragChange"
     >
       <template #item="{ element }">
-        <KanbanCard :card="element" @delete="deleteCard" />
+        <KanbanCard :card="element" @click="selectedCard = element" />
       </template>
     </draggable>
     <div class="add-card">
       <input v-model="newCardTitle" placeholder="Новая задача..." @keyup.enter="addCard" />
       <button @click="addCard">+</button>
     </div>
+    <CardModal
+      v-if="selectedCard"
+      :card="selectedCard"
+      @close="selectedCard = null"
+      @update="updateCard"
+      @delete="deleteCardFromModal"
+    />
   </div>
 </template>
 
