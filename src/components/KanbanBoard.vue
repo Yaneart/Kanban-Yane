@@ -65,7 +65,7 @@ function addColumn() {
   const title = newColumnTitle.value.trim()
   if (!title) return
   const column: Column = {
-    id: `column-${Date.now()}`,
+    id: crypto.randomUUID(),
     title,
     cards: [],
   }
@@ -144,7 +144,7 @@ function restoreCard(columnId: string, cardId: string) {
     <div class="board-body">
       <div class="board-content">
         <draggable
-          v-model="board.columns"
+          :list="board.columns"
           group="column"
           item-key="id"
           class="column-list"

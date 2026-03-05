@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { Card } from '@/types'
 
-const props = defineProps<{
+defineProps<{
   card: Card
 }>()
 
-function formaterDate(timestamp: number) {
+function formatDate(timestamp: number) {
   return new Date(timestamp).toLocaleDateString()
 }
 </script>
@@ -27,16 +27,16 @@ function formaterDate(timestamp: number) {
       {{ card.description }}
     </p>
     <p v-if="card.deadline" :class="{ overdue: card.deadline < Date.now() }" class="deadline">
-      {{ formaterDate(card.deadline) }}
+      {{ formatDate(card.deadline) }}
     </p>
     <div :class="['priority-dot', card.priority]"></div>
     <div v-if="card.subtask?.length" class="subtasks">
       <span class="subtasks-progress">
         {{ card.subtask.filter((s) => s.done).length }}/{{ card.subtask.length }}
       </span>
-      <label v-for="sub in card.subtask" :key="sub.id" class="subtask-item">
+      <div v-for="sub in card.subtask" :key="sub.id" class="subtask-item">
         <span :class="{ done: sub.done }">{{ sub.text }}</span>
-      </label>
+      </div>
     </div>
     <span v-if="card.comments?.length" class="comment-count"> 💬 {{ card.comments.length }} </span>
   </div>
@@ -136,7 +136,6 @@ function formaterDate(timestamp: number) {
   gap: 6px;
   font-size: 12px;
   color: var(--text-secondary);
-  cursor: pointer;
   padding: 2px 0;
 }
 

@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import type { Card, Comment, SubTask, Tag } from '@/types'
 import { useHistory } from '@/composables/useHistory'
 import { availableTags } from '@/data/tags'
-import { useToast } from '@/composables/useToast';
+import { useToast } from '@/composables/useToast'
 
 const props = defineProps<{
   card: Card
@@ -99,7 +99,7 @@ function toggleSubtask(subtask: SubTask) {
   emit('update', { ...props.card, subtask: updatedSubtask })
 }
 
-function formaterDate(timestamp: number) {
+function formatDate(timestamp: number) {
   return new Date(timestamp).toLocaleDateString()
 }
 
@@ -120,6 +120,7 @@ function toggleTag(tag: Tag) {
 
   const newTag = exists ? currentTag.filter((s) => s.id !== tag.id) : [...currentTag, tag]
   emit('update', { ...props.card, tags: newTag })
+  addHistory(`${exists ? 'Убрана' : 'Добавлена'} метка "${tag.name}"`)
 }
 
 function hasTag(tagId: string) {
@@ -139,7 +140,7 @@ function addComment() {
   const updateComments = [...(props.card.comments || []), comment]
   emit('update', { ...props.card, comments: updateComments })
   addHistory(`Комментарий к "${props.card.title}"`)
-  addToast('Комментарии добавлен', 'info')
+  addToast('Комментарий добавлен', 'info')
   newComment.value = ''
 }
 
@@ -160,7 +161,12 @@ function archivedCard() {
 
 <template>
   <Teleport to="body">
-    <div class="modal-overlay" @click.self="emit('close')">
+    <div
+      class="modal-overlay"
+      @click.self="emit('close')"
+      @keydown.escape="emit('close')"
+      tabindex="0"
+    >
       <div class="modal-content">
         <button class="btn-icon modal-close" @click="emit('close')">✕</button>
 
@@ -199,7 +205,7 @@ function archivedCard() {
             class="modal-deadline"
             :class="{ overdue: isOverdue(card.deadline) }"
           >
-            Дедлайн: {{ formaterDate(card.deadline) }}
+            Дедлайн: {{ formatDate(card.deadline) }}
           </div>
 
           <div v-if="card.subtask?.length" class="modal-subtasks">
@@ -214,7 +220,7 @@ function archivedCard() {
             <h3>Комментарии {{ card.comments?.length ? `(${card.comments.length})` : '' }}</h3>
             <div v-for="c in card.comments" :key="c.id" class="comment-item">
               <div class="comment-header">
-                <span class="comment-time">{{ formaterDate(c.createdAt) }}</span>
+                <span class="comment-time">{{ formatDate(c.createdAt) }}</span>
                 <button class="btn-icon comment-delete" @click="deleteComment(c.id)">✕</button>
               </div>
               <p class="comment-text">{{ c.text }}</p>
@@ -231,7 +237,7 @@ function archivedCard() {
             </div>
           </div>
 
-          <div class="modal-meta">Создано: {{ formaterDate(card.createdAt) }}</div>
+          <div class="modal-meta">Создано: {{ formatDate(card.createdAt) }}</div>
 
           <div class="modal-actions">
             <button class="btn btn-accent" @click="startEditing">Редактировать</button>
@@ -244,7 +250,12 @@ function archivedCard() {
         <div v-else class="modal-edit">
           <div class="edit-field">
             <label>Название</label>
-            <input class="input input-bordered" v-model="editTitle" @keyup.enter="saveEdit" @keyup.escape="cancelEdit" />
+            <input
+              class="input input-bordered"
+              v-model="editTitle"
+              @keyup.enter="saveEdit"
+              @keyup.escape="cancelEdit"
+            />
           </div>
 
           <div class="edit-field">
@@ -264,7 +275,12 @@ function archivedCard() {
               <button @click="removeSubtask(st.id)">✕</button>
             </div>
             <div class="add-subtask">
-              <input v-model="newSubTask" class="input" placeholder="Новая подзадача..." @keyup.enter="addSubtask" />
+              <input
+                v-model="newSubTask"
+                class="input"
+                placeholder="Новая подзадача..."
+                @keyup.enter="addSubtask"
+              />
               <button class="btn btn-accent btn-sm" @click="addSubtask">+</button>
             </div>
           </div>
@@ -507,5 +523,4 @@ function archivedCard() {
 .comment-add button {
   margin-top: 6px;
 }
-
 </style>

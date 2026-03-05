@@ -1,10 +1,5 @@
 import { ref, inject, provide, type InjectionKey, type Ref } from 'vue'
-
-interface HistoryEntry {
-  id: string
-  action: string
-  timestamp: number
-}
+import type { HistoryEntry } from '@/types'
 
 interface HistoryContext {
   history: Ref<HistoryEntry[]>
@@ -18,7 +13,7 @@ export function provideHistory() {
 
   function addHistory(action: string) {
     history.value.unshift({
-      id: `history-${Date.now()}`,
+      id: crypto.randomUUID(),
       action,
       timestamp: Date.now(),
     })

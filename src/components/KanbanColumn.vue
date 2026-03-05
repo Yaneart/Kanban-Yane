@@ -45,9 +45,11 @@ const filteredCards = computed(() => {
   return cards
 })
 
+const activeCards = computed(() => props.column.cards.filter((c) => !c.archived))
+
 const isOverLimit = computed(() => {
   if (!props.column.wipLimit) return false
-  return props.column.cards.length >= props.column.wipLimit
+  return activeCards.value.length >= props.column.wipLimit
 })
 
 function startEditing() {
@@ -60,7 +62,7 @@ function saveEdit() {
   const title = editTitle.value.trim()
   if (!title) return
   props.column.title = title
-  props.column.wipLimit = editWipLimit.value || undefined
+  props.column.wipLimit = editWipLimit.value > 0 ? editWipLimit.value : undefined
   addHistory(`Колонка переименована в "${title}"`)
   isEditing.value = false
 }
@@ -75,7 +77,7 @@ function addCard() {
   if (!title) return
 
   const card: Card = {
-    id: `card-${Date.now()}`,
+    id: crypto.randomUUID(),
     title,
     description: '',
     createdAt: Date.now(),
@@ -86,18 +88,6 @@ function addCard() {
   addHistory(`Добавлена карточка "${title}" в "${props.column.title}"`)
   addToast('Карточка добавлена', 'success')
   newCardTitle.value = ''
-}
-
-function deleteCard(id: string) {
-  const index = props.column.cards.findIndex((c) => c.id === id)
-
-  if (index !== -1) {
-    const card = props.column.cards[index]
-    if (!card) return
-    addHistory(`Удалена карточка "${card.title}" из "${props.column.title}"`)
-    addToast('Карточка удалена', 'success')
-    props.column.cards.splice(index, 1)
-  }
 }
 
 function onDragChange(event: any) {
@@ -140,7 +130,7 @@ function deleteCardFromModal(id: string) {
       <h3 v-else @dblclick="startEditing">
         {{ column.title }}
         <span class="count"
-          >({{ column.cards.length
+          >({{ activeCards.length
           }}<template v-if="column.wipLimit">/ {{ column.wipLimit }}</template
           >)</span
         >
@@ -167,15 +157,16 @@ function deleteCardFromModal(id: string) {
       </div>
     </template>
     <draggable
-      :list="filteredCards"
+      :model-value="filteredCards"
       group="cards"
       item-key="id"
       class="cards-list"
       :animation="200"
       @change="onDragChange"
+      @update:model-value="(val: any) => (props.column.cards = val)"
     >
       <template #item="{ element }">
-        <KanbanCard :card="element" @click="selectedCard = element" />
+        <KanbanCard v-if="!element.archived" :card="element" @click="selectedCard = element" />
       </template>
     </draggable>
     <div class="add-card">

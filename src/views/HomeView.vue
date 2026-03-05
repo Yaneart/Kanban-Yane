@@ -26,6 +26,7 @@ function createBoard() {
 }
 
 function deleteBoard(id: string) {
+  if (!window.confirm('Удалить доску?')) return
   boards.value = boards.value.filter((e) => e.id !== id)
   addToast('Доска удалена', 'success')
 }
