@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import type { Card } from '@/types'
+import { formatDate } from '@/utils/format'
 
 defineProps<{
   card: Card
 }>()
-
-function formatDate(timestamp: number) {
-  return new Date(timestamp).toLocaleDateString()
-}
 </script>
 
 <template>

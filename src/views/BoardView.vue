@@ -1,22 +1,19 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
-import { useLocalStorage } from '@/composables/useLocalStorage'
 import type { Board } from '@/types'
 import { computed } from 'vue'
 import KanbanBoard from '@/components/KanbanBoard.vue'
+import { useBoardsStore } from '@/stores/boards'
 
 const route = useRoute()
-const boards = useLocalStorage<Board[]>('kanban-boards', [])
+const boardsStore = useBoardsStore()
 
 const board = computed(() => {
-  return boards.value.find((b) => b.id === route.params.id)
+  return boardsStore.getBoard(route.params.id as string)
 })
 
 function updateBoard(newBoard: Board) {
-  const index = boards.value.findIndex((b) => b.id === route.params.id)
-  if (index !== -1) {
-    boards.value[index] = newBoard
-  }
+  boardsStore.updateBoard(route.params.id as string, newBoard)
 }
 </script>
 

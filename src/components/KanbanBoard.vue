@@ -6,6 +6,9 @@ import { computed, ref } from 'vue'
 import { provideHistory } from '@/composables/useHistory'
 import { useThemeStore } from '@/stores/theme'
 import { useToast } from '@/composables/useToast'
+import { formatTime } from '@/utils/format'
+import { useBackground } from '@/composables/useBackground'
+import { useBoardActions } from '@/composables/useBoardActions'
 
 const props = defineProps<{
   board: Board
@@ -23,112 +26,8 @@ const themeStore = useThemeStore()
 const showArchive = ref(false)
 const { addToast } = useToast()
 const showBgPicker = ref(false)
-
-const backgrounds = [
-  // Тёмные
-  'linear-gradient(135deg, #1a1a2e, #16213e, #0f3460)',
-  'linear-gradient(135deg, #0f0c29, #302b63, #24243e)',
-  'linear-gradient(135deg, #2d1b69, #6b21a8, #9333ea)',
-  'linear-gradient(135deg, #064e3b, #065f46, #047857)',
-  'linear-gradient(135deg, #7f1d1d, #991b1b, #b91c1c)',
-  'linear-gradient(135deg, #1a1033, #2d1b69, #4a2c8a)',
-  // Светлые
-  'linear-gradient(135deg, #e0c3fc, #8ec5fc, #f5f7fa)',
-  'linear-gradient(135deg, #fbc2eb, #a6c1ee, #c2e9fb)',
-  'linear-gradient(135deg, #a8edea, #fed6e3, #fefbd8)',
-  'linear-gradient(135deg, #d4fc79, #96e6a1, #c2ffd8)',
-  'linear-gradient(135deg, #ffecd2, #fcb69f, #ff9a9e)',
-  'linear-gradient(135deg, #a1c4fd, #c2e9fb, #e8f0fe)',
-  'linear-gradient(135deg, #f3e7e9, #e3eeff, #d4e4ff)',
-  'linear-gradient(135deg, #fad0c4, #ffd1ff, #e8cff7)',
-  // Однотонные
-  '#1a1a2e',
-  '#0f172a',
-  '#1e293b',
-  '#f0eaf5',
-  '#e8e0f0',
-  '#f5f7fa',
-]
-
-const boardStyle = computed(() => {
-  const bg = props.board.background
-  if (!bg) {
-    return {
-      background:
-        'linear-gradient(135deg, var(--bg-gradient-1), var(--bg-gradient-2), var(--bg-gradient-3))',
-    }
-  }
-  if (bg.startsWith('http')) {
-    return { backgroundImage: `url(${bg})`, backgroundSize: 'cover', backgroundPosition: 'center' }
-  }
-  return { background: bg }
-})
-
-function getHexBrightness(hex: string): number {
-  const r = parseInt(hex.slice(1, 3), 16)
-  const g = parseInt(hex.slice(3, 5), 16)
-  const b = parseInt(hex.slice(5, 7), 16)
-  return (r * 299 + g * 587 + b * 114) / 1000
-}
-
-function setBackground(bg: string) {
-  props.board.background = bg
-
-  const hexMatch = bg.match(/#[0-9a-fA-F]{6}/)
-  if (hexMatch) {
-    const brightness = getHexBrightness(hexMatch[0])
-    const shouldBeLight = brightness > 128
-    if (
-      (shouldBeLight && themeStore.theme === 'dark') ||
-      (!shouldBeLight && themeStore.theme === 'light')
-    ) {
-      themeStore.toggleTheme()
-    }
-  }
-}
-
-function resetBackground() {
-  props.board.background = undefined
-}
-
-function formatTime(timestamp: number) {
-  return new Date(timestamp).toLocaleTimeString()
-}
-
-function exportBoard() {
-  const json = JSON.stringify(props.board, null, 2)
-  const blob = new Blob([json], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = 'kanban-board.json'
-  a.click()
-  URL.revokeObjectURL(url)
-  addToast('Доска экспортирована', 'success')
-}
-
-function importBoard() {
-  const input = document.createElement('input')
-  input.type = 'file'
-  input.accept = '.json'
-  input.onchange = () => {
-    const file = input.files?.[0]
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = () => {
-      try {
-        const data = JSON.parse(reader.result as string) as Board
-        emit('update:board', data)
-        addHistory('Доска импортирована')
-        addToast('Доска импортирована', 'success')
-      } catch {
-        addToast('Ошибка импорта', 'error')
-      }
-    }
-    reader.readAsText(file)
-  }
-  input.click()
-}
+const { backgrounds, boardStyle, setBackground, resetBackground } = useBackground(props.board)
+const { exportBoard, importBoard } = useBoardActions(props.board, emit, addHistory)
 
 function addColumn() {
   const title = newColumnTitle.value.trim()

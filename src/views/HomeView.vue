@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { useLocalStorage } from '@/composables/useLocalStorage'
 import { useToast } from '@/composables/useToast'
 import { useThemeStore } from '@/stores/theme'
 import type { Board } from '@/types'
 import { ref } from 'vue'
+import { useBoardsStore } from '@/stores/boards'
 
-const boards = useLocalStorage<Board[]>('kanban-boards', [])
+const boardsStore = useBoardsStore()
 const newTitle = ref('')
 const themeStore = useThemeStore()
 const { addToast } = useToast()
@@ -20,14 +20,14 @@ function createBoard() {
     columns: [],
   }
 
-  boards.value.push(newBoard)
+  boardsStore.addBoard(newBoard)
   addToast('Доска создана', 'success')
   newTitle.value = ''
 }
 
 function deleteBoard(id: string) {
   if (!window.confirm('Удалить доску?')) return
-  boards.value = boards.value.filter((e) => e.id !== id)
+  boardsStore.deleteBoard(id)
   addToast('Доска удалена', 'success')
 }
 </script>
@@ -42,7 +42,7 @@ function deleteBoard(id: string) {
     </header>
 
     <div class="boards-grid">
-      <div v-for="board in boards" :key="board.id" class="board-card">
+      <div v-for="board in boardsStore.boards" :key="board.id" class="board-card">
         <RouterLink :to="'/board/' + board.id" class="board-link">
           {{ board.title }}
         </RouterLink>

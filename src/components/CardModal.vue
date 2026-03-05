@@ -4,6 +4,7 @@ import type { Card, Comment, SubTask, Tag } from '@/types'
 import { useHistory } from '@/composables/useHistory'
 import { availableTags } from '@/data/tags'
 import { useToast } from '@/composables/useToast'
+import { formatDate } from '@/utils/format'
 
 const props = defineProps<{
   card: Card
@@ -103,10 +104,6 @@ function toggleSubtask(subtask: SubTask) {
   })
 
   emit('update', { ...props.card, subtask: updatedSubtask })
-}
-
-function formatDate(timestamp: number) {
-  return new Date(timestamp).toLocaleDateString()
 }
 
 function isOverdue(deadline: number) {
