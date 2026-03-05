@@ -19,33 +19,38 @@ const { toasts } = useToast()
 <style scoped>
 .toast-container {
   position: fixed;
-  top: 20px;
-  right: 20px;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 9999;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  align-items: center;
 }
 
 .toast {
-  padding: 12px 20px;
+  padding: 12px 16px 12px 20px;
   border-radius: 8px;
-  color: #fff;
   font-size: 14px;
   font-weight: 500;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  background: var(--bg-column);
+  color: var(--text-primary);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 16px var(--shadow);
+  border: 1px solid var(--bg-hover);
 }
 
 .toast-success {
-  background: var(--priority-low);
+  border-color: var(--priority-low);
 }
 
 .toast-error {
-  background: var(--priority-high);
+  border-color: var(--priority-high);
 }
 
 .toast-info {
-  background: var(--accent);
+  border-color: var(--accent);
 }
 
 .toast-enter-active {
@@ -58,11 +63,11 @@ const { toasts } = useToast()
 
 .toast-enter-from {
   opacity: 0;
-  transform: translateX(100px);
+  transform: translateY(30px);
 }
 
 .toast-leave-to {
   opacity: 0;
-  transform: translateX(100px);
+  transform: translateY(30px);
 }
 </style>
