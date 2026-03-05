@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Card, Column } from '@/types'
 import KanbanCard from './KanbanCard.vue'
-import { computed, ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 import draggable from 'vuedraggable'
 import { useHistory } from '@/composables/useHistory'
 import CardModal from './CardModal.vue'
@@ -19,11 +19,12 @@ const emit = defineEmits<{
 const newCardTitle = ref('')
 const isEditing = ref(false)
 const editTitle = ref('')
-const editWipLimit = ref(0)
+const editWipLimit = ref<number | undefined>(0)
 const { addHistory } = useHistory()
 const sortMode = ref<'none' | 'priority' | 'date' | 'name'>('none')
 const selectedCard = ref<Card | null>(null)
 const { addToast } = useToast()
+const editInputRef = ref<HTMLInputElement | null>(null)
 
 const filteredCards = computed(() => {
   const query = props.searchQuery.toLowerCase().trim()
@@ -54,15 +55,16 @@ const isOverLimit = computed(() => {
 
 function startEditing() {
   editTitle.value = props.column.title
-  editWipLimit.value = props.column.wipLimit ?? 0
+  editWipLimit.value = props.column.wipLimit
   isEditing.value = true
+  nextTick(() => editInputRef.value?.focus())
 }
 
 function saveEdit() {
   const title = editTitle.value.trim()
   if (!title) return
   props.column.title = title
-  props.column.wipLimit = editWipLimit.value > 0 ? editWipLimit.value : undefined
+  props.column.wipLimit = (editWipLimit.value ?? 0) > 0 ? editWipLimit.value : undefined
   addHistory(`Колонка переименована в "${title}"`)
   isEditing.value = false
 }
@@ -114,6 +116,18 @@ function deleteCardFromModal(id: string) {
   }
   selectedCard.value = null
 }
+
+function onDragMove(event: any) {
+  if (event.to === event.from) return true
+
+  const targetLimit = Number(event.to.dataset.wipLimit) || 0
+  const targetCount = Number(event.to.dataset.activeCount) || 0
+
+  if (targetLimit && targetCount >= targetLimit) {
+    return false
+  }
+  return true
+}
 </script>
 
 <template>
@@ -121,6 +135,7 @@ function deleteCardFromModal(id: string) {
     <div class="column-header">
       <template v-if="isEditing">
         <input
+          ref="editInputRef"
           v-model="editTitle"
           class="edit-input"
           @keyup.enter="saveEdit"
@@ -162,6 +177,9 @@ function deleteCardFromModal(id: string) {
       item-key="id"
       class="cards-list"
       :animation="200"
+      :move="onDragMove"
+      :data-wip-limit="column.wipLimit || 0"
+      :data-active-count="activeCards.length"
       @change="onDragChange"
       @update:model-value="(val: any) => (props.column.cards = val)"
     >

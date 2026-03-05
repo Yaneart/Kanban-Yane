@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import type { Card, Comment, SubTask, Tag } from '@/types'
 import { useHistory } from '@/composables/useHistory'
 import { availableTags } from '@/data/tags'
@@ -14,6 +14,12 @@ const emit = defineEmits<{
   update: [card: Card]
   delete: [id: string]
 }>()
+
+const overlayRef = ref<HTMLElement | null>(null)
+
+onMounted(() => {
+  overlayRef.value?.focus()
+})
 
 const { addHistory } = useHistory()
 
@@ -162,6 +168,7 @@ function archivedCard() {
 <template>
   <Teleport to="body">
     <div
+      ref="overlayRef"
       class="modal-overlay"
       @click.self="emit('close')"
       @keydown.escape="emit('close')"
