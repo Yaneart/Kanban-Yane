@@ -53,6 +53,11 @@ const isOverLimit = computed(() => {
   return activeCards.value.length >= props.column.wipLimit
 })
 
+const progressPercent = computed(() => {
+  if (!props.column.wipLimit) return 0
+  return Math.min((activeCards.value.length / props.column.wipLimit) * 100, 100)
+})
+
 function startEditing() {
   editTitle.value = props.column.title
   editWipLimit.value = props.column.wipLimit
@@ -152,13 +157,23 @@ function onDragMove(event: any) {
       </h3>
       <button class="btn-icon delete-column-btn" @click="emit('delete', column.id)">✕</button>
     </div>
+    <div v-if="column.wipLimit" class="progress-bar">
+      <div
+        class="progress-fill"
+        :style="{ width: progressPercent + '%' }"
+        :class="{
+          'progress-warning': progressPercent >= 70 && progressPercent < 100,
+          'progress-danger': progressPercent >= 100,
+        }"
+      ></div>
+    </div>
+    <select v-model="sortMode" class="sort-select">
+      <option value="none">Без сортировки</option>
+      <option value="priority">По приоритету</option>
+      <option value="date">По дате</option>
+      <option value="name">По имени</option>
+    </select>
     <template v-if="isEditing">
-      <select v-model="sortMode" class="sort-select">
-        <option value="none">Без сортировки</option>
-        <option value="priority">По приоритету</option>
-        <option value="date">По дате</option>
-        <option value="name">По имени</option>
-      </select>
       <input
         v-model.number="editWipLimit"
         type="number"
@@ -264,6 +279,8 @@ function onDragMove(event: any) {
 
 .edit-actions {
   display: flex;
+  align-items: center;
+  align-self: center;
   gap: 6px;
   margin-bottom: 8px;
 }
@@ -330,5 +347,28 @@ function onDragMove(event: any) {
 .sort-select option {
   background: var(--bg-column);
   color: var(--text-primary);
+}
+
+.progress-bar {
+  height: 4px;
+  background: var(--bg-input);
+  border-radius: 2px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.progress-warning {
+  background: #f59e0b;
+}
+
+.progress-danger {
+  background: var(--danger);
 }
 </style>
