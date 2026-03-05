@@ -22,10 +22,79 @@ const { history, addHistory } = provideHistory()
 const themeStore = useThemeStore()
 const showArchive = ref(false)
 const { addToast } = useToast()
+const showBgPicker = ref(false)
+
+const backgrounds = [
+  // Тёмные
+  'linear-gradient(135deg, #1a1a2e, #16213e, #0f3460)',
+  'linear-gradient(135deg, #0f0c29, #302b63, #24243e)',
+  'linear-gradient(135deg, #2d1b69, #6b21a8, #9333ea)',
+  'linear-gradient(135deg, #064e3b, #065f46, #047857)',
+  'linear-gradient(135deg, #7f1d1d, #991b1b, #b91c1c)',
+  'linear-gradient(135deg, #1a1033, #2d1b69, #4a2c8a)',
+  // Светлые
+  'linear-gradient(135deg, #e0c3fc, #8ec5fc, #f5f7fa)',
+  'linear-gradient(135deg, #fbc2eb, #a6c1ee, #c2e9fb)',
+  'linear-gradient(135deg, #a8edea, #fed6e3, #fefbd8)',
+  'linear-gradient(135deg, #d4fc79, #96e6a1, #c2ffd8)',
+  'linear-gradient(135deg, #ffecd2, #fcb69f, #ff9a9e)',
+  'linear-gradient(135deg, #a1c4fd, #c2e9fb, #e8f0fe)',
+  'linear-gradient(135deg, #f3e7e9, #e3eeff, #d4e4ff)',
+  'linear-gradient(135deg, #fad0c4, #ffd1ff, #e8cff7)',
+  // Однотонные
+  '#1a1a2e',
+  '#0f172a',
+  '#1e293b',
+  '#f0eaf5',
+  '#e8e0f0',
+  '#f5f7fa',
+]
+
+const boardStyle = computed(() => {
+  const bg = props.board.background
+  if (!bg) {
+    return {
+      background:
+        'linear-gradient(135deg, var(--bg-gradient-1), var(--bg-gradient-2), var(--bg-gradient-3))',
+    }
+  }
+  if (bg.startsWith('http')) {
+    return { backgroundImage: `url(${bg})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+  }
+  return { background: bg }
+})
+
+function getHexBrightness(hex: string): number {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  return (r * 299 + g * 587 + b * 114) / 1000
+}
+
+function setBackground(bg: string) {
+  props.board.background = bg
+
+  const hexMatch = bg.match(/#[0-9a-fA-F]{6}/)
+  if (hexMatch) {
+    const brightness = getHexBrightness(hexMatch[0])
+    const shouldBeLight = brightness > 128
+    if (
+      (shouldBeLight && themeStore.theme === 'dark') ||
+      (!shouldBeLight && themeStore.theme === 'light')
+    ) {
+      themeStore.toggleTheme()
+    }
+  }
+}
+
+function resetBackground() {
+  props.board.background = undefined
+}
 
 function formatTime(timestamp: number) {
   return new Date(timestamp).toLocaleTimeString()
 }
+
 function exportBoard() {
   const json = JSON.stringify(props.board, null, 2)
   const blob = new Blob([json], { type: 'application/json' })
@@ -122,7 +191,7 @@ function restoreCard(columnId: string, cardId: string) {
 </script>
 
 <template>
-  <div class="kanban-board">
+  <div class="kanban-board" :style="boardStyle">
     <!-- Header -->
     <header class="board-header">
       <RouterLink to="/" class="back-btn">← Назад</RouterLink>
@@ -132,6 +201,7 @@ function restoreCard(columnId: string, cardId: string) {
         <button class="btn btn-danger" @click="resetBoard">Сбросить</button>
         <button class="btn btn-primary" @click="showHistory = !showHistory">История</button>
         <button class="btn btn-primary" @click="showArchive = !showArchive">Архив</button>
+        <button class="btn btn-primary" @click="showBgPicker = !showBgPicker">Фон</button>
         <button class="btn btn-primary" @click="themeStore.toggleTheme()">
           {{ themeStore.theme === 'dark' ? '☀️' : '🌙' }}
         </button>
@@ -139,6 +209,22 @@ function restoreCard(columnId: string, cardId: string) {
         <button class="btn btn-primary" @click="importBoard">Импорт</button>
       </div>
     </header>
+
+    <div v-if="showBgPicker" class="bg-picker">
+      <div
+        v-for="bg in backgrounds"
+        :key="bg"
+        class="bg-option"
+        :style="{ background: bg }"
+        @click="setBackground(bg)"
+      ></div>
+      <input
+        class="input bg-url-input"
+        placeholder="URL картинки..."
+        @keyup.enter="setBackground(($event.target as HTMLInputElement).value)"
+      />
+      <button class="btn btn-ghost btn-sm" @click="resetBackground">Сброс</button>
+    </div>
 
     <!-- Main content -->
     <div class="board-body">
@@ -210,12 +296,6 @@ function restoreCard(columnId: string, cardId: string) {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: linear-gradient(
-    135deg,
-    var(--bg-gradient-1),
-    var(--bg-gradient-2),
-    var(--bg-gradient-3)
-  );
 }
 
 /* ===== Header ===== */
@@ -407,6 +487,36 @@ function restoreCard(columnId: string, cardId: string) {
 
 .restore-btn {
   color: var(--accent);
+}
+
+.bg-picker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  flex-wrap: wrap;
+}
+
+.bg-option {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition:
+    border-color 0.2s,
+    transform 0.2s;
+}
+
+.bg-option:hover {
+  border-color: var(--accent);
+  transform: scale(1.1);
+}
+
+.bg-url-input {
+  max-width: 200px;
 }
 
 /* ===== Mobile ===== */

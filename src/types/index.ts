@@ -23,6 +23,7 @@ export interface Board {
   id: string
   title: string
   columns: Column[]
+  background?: string
 }
 //История действий
 export interface HistoryEntry {
