@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import type { Card, Comment, SubTask, Tag } from '@/types'
 import { useHistory } from '@/composables/useHistory'
 import { availableTags } from '@/data/tags'
+import { useToast } from '@/composables/useToast';
 
 const props = defineProps<{
   card: Card
@@ -30,6 +31,7 @@ const editDeadline = ref('')
 const editSubTask = ref<SubTask[]>([])
 const newSubTask = ref('')
 const newComment = ref('')
+const { addToast } = useToast()
 
 function startEditing() {
   editTitle.value = props.card.title
@@ -69,6 +71,7 @@ function togglePriority() {
 
   emit('update', { ...props.card, priority: nextPriority ?? 'low' })
   addHistory(`Смена приоритета на ${nextPriority}`)
+  addToast('Приоритет сменен', 'info')
 }
 
 function addSubtask() {
@@ -136,18 +139,21 @@ function addComment() {
   const updateComments = [...(props.card.comments || []), comment]
   emit('update', { ...props.card, comments: updateComments })
   addHistory(`Комментарий к "${props.card.title}"`)
+  addToast('Комментарии добавлен', 'info')
   newComment.value = ''
 }
 
 function deleteComment(id: string) {
   const updatedComments = (props.card.comments || []).filter((t) => t.id !== id)
   addHistory(`Удален Комментарий`)
+  addToast('Комментарий удалён', 'info')
   emit('update', { ...props.card, comments: updatedComments })
 }
 
 function archivedCard() {
   emit('update', { ...props.card, archived: true })
   addHistory(`Архивирована карточка "${props.card.title}"`)
+  addToast('Карточка архивирована', 'info')
   emit('close')
 }
 </script>

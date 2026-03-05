@@ -1,10 +1,14 @@
 <script setup lang="ts">
+import ToastContainer from './components/ToastContainer.vue'
+import { provideToast } from './composables/useToast'
 import { useThemeStore } from './stores/theme'
 
 useThemeStore()
+provideToast()
 </script>
 
 <template>
+  <ToastContainer />
   <RouterView />
 </template>
 
@@ -84,6 +88,11 @@ useThemeStore()
 
 body {
   margin: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
 }
 </style>

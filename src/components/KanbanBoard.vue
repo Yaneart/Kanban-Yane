@@ -5,6 +5,7 @@ import draggable from 'vuedraggable'
 import { computed, ref } from 'vue'
 import { provideHistory } from '@/composables/useHistory'
 import { useThemeStore } from '@/stores/theme'
+import { useToast } from '@/composables/useToast'
 
 const props = defineProps<{
   board: Board
@@ -20,6 +21,7 @@ const showHistory = ref(false)
 const { history, addHistory } = provideHistory()
 const themeStore = useThemeStore()
 const showArchive = ref(false)
+const { addToast } = useToast()
 
 function formatTime(timestamp: number) {
   return new Date(timestamp).toLocaleTimeString()
@@ -33,6 +35,7 @@ function exportBoard() {
   a.download = 'kanban-board.json'
   a.click()
   URL.revokeObjectURL(url)
+  addToast('Доска экспортирована', 'success')
 }
 
 function importBoard() {
@@ -48,8 +51,9 @@ function importBoard() {
         const data = JSON.parse(reader.result as string) as Board
         emit('update:board', data)
         addHistory('Доска импортирована')
+        addToast('Доска импортирована', 'success')
       } catch {
-        alert('Ошибка: неверный формат файла')
+        addToast('Ошибка импорта', 'error')
       }
     }
     reader.readAsText(file)
@@ -67,6 +71,7 @@ function addColumn() {
   }
   props.board.columns.push(column)
   addHistory(`Добавлена колонка "${title}"`)
+  addToast('Колонка добавлена', 'success')
   newColumnTitle.value = ''
 }
 
@@ -80,12 +85,14 @@ function deleteColumn(id: string) {
     if (!window.confirm(`Удалить колонку с ${column.cards.length} карточками?`)) return
   }
   addHistory(`Удалена колонка "${column.title}"`)
+  addToast('Колонка удалена', 'success')
   props.board.columns.splice(index, 1)
 }
 
 function resetBoard() {
   if (!window.confirm('Сбросить доску? Все данные будут потеряны!')) return
   addHistory('Доска сброшена')
+  addToast('Доска сброшена', 'success')
   emit('update:board', { ...props.board, columns: [] })
 }
 
@@ -110,6 +117,7 @@ function restoreCard(columnId: string, cardId: string) {
 
   card.archived = false
   addHistory(`Восстановлена карточка "${card.title}"`)
+  addToast('Карточка восстановлена', 'success')
 }
 </script>
 
@@ -186,7 +194,9 @@ function restoreCard(columnId: string, cardId: string) {
               <span class="archive-card-title">{{ card.title }}</span>
               <span class="archive-card-column">{{ card.columnTitle }}</span>
             </div>
-            <button class="btn-icon restore-btn" @click="restoreCard(card.columnId, card.id)">↩</button>
+            <button class="btn-icon restore-btn" @click="restoreCard(card.columnId, card.id)">
+              ↩
+            </button>
           </div>
         </aside>
       </Transition>
@@ -241,7 +251,6 @@ function restoreCard(columnId: string, cardId: string) {
   gap: 8px;
   margin-left: auto;
 }
-
 
 /* ===== Body ===== */
 .board-body {

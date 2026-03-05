@@ -48,3 +48,9 @@ export interface Comment {
   text: string
   createdAt: number
 }
+//Тоаст
+export interface Toast {
+  id: string
+  message: string
+  type: 'success' | 'error' | 'info'
+}

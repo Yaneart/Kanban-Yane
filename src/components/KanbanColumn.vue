@@ -5,6 +5,7 @@ import { computed, ref } from 'vue'
 import draggable from 'vuedraggable'
 import { useHistory } from '@/composables/useHistory'
 import CardModal from './CardModal.vue'
+import { useToast } from '@/composables/useToast'
 
 const props = defineProps<{
   column: Column
@@ -22,6 +23,7 @@ const editWipLimit = ref(0)
 const { addHistory } = useHistory()
 const sortMode = ref<'none' | 'priority' | 'date' | 'name'>('none')
 const selectedCard = ref<Card | null>(null)
+const { addToast } = useToast()
 
 const filteredCards = computed(() => {
   const query = props.searchQuery.toLowerCase().trim()
@@ -82,6 +84,7 @@ function addCard() {
 
   props.column.cards.push(card)
   addHistory(`Добавлена карточка "${title}" в "${props.column.title}"`)
+  addToast('Карточка добавлена', 'success')
   newCardTitle.value = ''
 }
 
@@ -92,6 +95,7 @@ function deleteCard(id: string) {
     const card = props.column.cards[index]
     if (!card) return
     addHistory(`Удалена карточка "${card.title}" из "${props.column.title}"`)
+    addToast('Карточка удалена', 'success')
     props.column.cards.splice(index, 1)
   }
 }
@@ -99,6 +103,7 @@ function deleteCard(id: string) {
 function onDragChange(event: any) {
   if (event.added) {
     addHistory(`Карточка "${event.added.element.title}" перемещена в "${props.column.title}"`)
+    addToast('Карточка перемещена', 'success')
   }
 }
 
@@ -114,6 +119,7 @@ function deleteCardFromModal(id: string) {
   const card = props.column.cards.find((c) => c.id === id)
   if (card) {
     addHistory(`Удалена карточка "${card.title}" из "${props.column.title}"`)
+    addToast('Карточка удалена', 'success')
     props.column.cards = props.column.cards.filter((c) => c.id !== id)
   }
   selectedCard.value = null
