@@ -75,6 +75,21 @@ function resetBoard() {
   emit('update:board', { ...props.board, columns: [] })
 }
 
+function handleExport() {
+  exportBoard()
+  showMenu.value = false
+}
+
+function handleImport() {
+  importBoard()
+  showMenu.value = false
+}
+
+function handleReset() {
+  resetBoard()
+  showMenu.value = false
+}
+
 const archivedCards = computed(() => {
   return props.board.columns.flatMap((col) =>
     col.cards
@@ -158,32 +173,14 @@ function restoreCard(columnId: string, cardId: string) {
           </button>
           <Transition name="fade">
             <div v-if="showMenu" class="dropdown-menu">
-              <button
-                class="dropdown-item"
-                @click="
-                  exportBoard()
-                  showMenu = false
-                "
-              >
+              <button class="dropdown-item" @click="handleExport">
                 <span>📥</span> Экспорт доски
               </button>
-              <button
-                class="dropdown-item"
-                @click="
-                  importBoard()
-                  showMenu = false
-                "
-              >
+              <button class="dropdown-item" @click="handleImport">
                 <span>📤</span> Импорт доски
               </button>
               <div class="dropdown-separator"></div>
-              <button
-                class="dropdown-item danger"
-                @click="
-                  resetBoard()
-                  showMenu = false
-                "
-              >
+              <button class="dropdown-item danger" @click="handleReset">
                 <span>🗑️</span> Сбросить доску
               </button>
             </div>
