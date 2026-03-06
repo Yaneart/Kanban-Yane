@@ -191,6 +191,8 @@ function onDragMove(event: any) {
       group="cards"
       item-key="id"
       class="cards-list"
+      ghost-class="ghost"
+      drag-class="dragging"
       :animation="200"
       :move="onDragMove"
       :data-wip-limit="column.wipLimit || 0"
@@ -200,6 +202,11 @@ function onDragMove(event: any) {
     >
       <template #item="{ element }">
         <KanbanCard v-if="!element.archived" :card="element" @click="selectedCard = element" />
+      </template>
+      <template #footer>
+        <div v-if="filteredCards.length === 0" class="empty-placeholder">
+          Перетащите карточку сюда
+        </div>
       </template>
     </draggable>
     <div class="add-card">
@@ -370,5 +377,28 @@ function onDragMove(event: any) {
 
 .progress-danger {
   background: var(--danger);
+}
+
+.cards-list :deep(.ghost) {
+  opacity: 0.3;
+  background: var(--accent-soft);
+  border-radius: 8px;
+  border-left-color: var(--accent);
+}
+
+.cards-list :deep(.dragging) {
+  opacity: 0.9;
+  transform: rotate(3deg);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.empty-placeholder {
+  padding: 24px 12px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+  border: 2px dashed var(--bg-hover);
+  border-radius: 8px;
+  opacity: 0.7;
 }
 </style>

@@ -133,6 +133,8 @@ function restoreCard(columnId: string, cardId: string) {
           group="column"
           item-key="id"
           class="column-list"
+          ghost-class="column-ghost"
+          drag-class="column-dragging"
           :animation="200"
         >
           <template #item="{ element }">
@@ -416,6 +418,16 @@ function restoreCard(columnId: string, cardId: string) {
 
 .bg-url-input {
   max-width: 200px;
+}
+
+.column-list :deep(.column-ghost) {
+  opacity: 0.3;
+}
+
+.column-list :deep(.column-dragging) {
+  opacity: 0.9;
+  transform: rotate(2deg);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
 }
 
 /* ===== Mobile ===== */
