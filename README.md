@@ -1,48 +1,115 @@
-# Kanban
+# Vue Kanban Board
 
-This template should help get you started developing with Vue 3 in Vite.
+Канбан-доска для управления задачами. Поддержка нескольких досок, drag & drop, приоритеты, теги, подзадачи, комментарии, Markdown-описания, темы оформления и многое другое. Все данные хранятся локально в браузере (localStorage).
 
-## Recommended IDE Setup
+![Доска с карточками](screenshots/2.PNG)
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## Возможности
 
-## Recommended Browser Setup
+- Несколько досок с отдельными маршрутами
+- Drag & drop карточек и колонок
+- Приоритеты (низкий / средний / высокий) с цветовыми метками
+- Теги: Баг, Фича, Срочно, Улучшение, Документация
+- Дедлайны с подсветкой просроченных
+- Подзадачи (чеклист) с прогрессом выполнения
+- Комментарии на карточках
+- Markdown в описании карточки
+- Копирование и архивация карточек
+- WIP-лимиты с прогресс-баром на колонке
+- Сортировка карточек (по приоритету, дате, имени)
+- Поиск карточек
+- Экспорт / импорт доски (JSON)
+- Тёмная и светлая тема
+- Кастомный фон доски (цвет или картинка)
+- История действий
+- Toast-уведомления
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+## Скриншоты
 
-## Type Support for `.vue` Imports in TS
+### Главная страница
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+![Главная — список досок](screenshots/1.PNG)
 
-## Customize configuration
+### Доска с карточками (тёмная тема)
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+![Доска — тёмная тема](screenshots/2.PNG)
 
-## Project Setup
+### Модальное окно карточки
 
-```sh
+<p align="center">
+  <img src="screenshots/3.PNG" alt="Модалка карточки" width="400">
+</p>
+
+![Модалка в контексте доски](screenshots/3.5.PNG)
+
+### Светлая тема
+
+![Доска — светлая тема](screenshots/4.PNG)
+
+### Кастомный фон
+
+![Доска — кастомный фон](screenshots/5.PNG)
+
+### История действий
+
+<p align="center">
+  <img src="screenshots/6.PNG" alt="Sidebar с историей" width="350">
+</p>
+
+## Стек технологий
+
+| Технология | Назначение |
+|------------|------------|
+| Vue 3.5 | UI фреймворк (Composition API, `<script setup>`) |
+| TypeScript | Типизация |
+| Vue Router | Маршрутизация (несколько досок) |
+| Pinia | Глобальный state management |
+| vuedraggable | Drag & drop карточек и колонок |
+| marked | Парсинг Markdown |
+| Vite | Сборщик |
+
+## Установка и запуск
+
+```bash
 npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
+Приложение будет доступно по адресу `http://localhost:5173`
 
-```sh
+### Сборка для продакшена
+
+```bash
 npm run build
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+## Структура проекта
 
-```sh
-npm run lint
 ```
+src/
+├── components/          # Компоненты
+│   ├── KanbanBoard.vue  # Доска (колонки, фон, header)
+│   ├── KanbanColumn.vue # Колонка (карточки, сортировка, WIP)
+│   ├── KanbanCard.vue   # Карточка (приоритет, теги, дедлайн)
+│   └── CardModal.vue    # Модалка карточки (описание, подзадачи, комментарии)
+├── views/               # Страницы
+│   ├── HomeView.vue     # Список досок
+│   └── BoardView.vue    # Страница доски
+├── stores/              # Pinia stores
+│   ├── boards.ts        # CRUD досок
+│   └── theme.ts         # Тема оформления
+├── composables/         # Composables
+│   ├── useLocalStorage.ts
+│   ├── useHistory.ts
+│   ├── useToast.ts
+│   ├── useBackground.ts
+│   └── useBoardActions.ts
+├── types/index.ts       # TypeScript интерфейсы
+├── data/tags.ts         # Предопределённые теги
+├── styles/common.css    # Общие CSS-классы
+└── router/index.ts      # Маршруты
+```
+
+## Лицензия
+
+MIT
