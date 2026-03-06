@@ -1,10 +1,17 @@
 <script setup lang="ts">
 import type { Card } from '@/types'
 import { formatDate } from '@/utils/format'
+import { marked } from 'marked'
+import { computed } from 'vue'
 
-defineProps<{
+const props = defineProps<{
   card: Card
 }>()
+
+const parsedDescription = computed(() => {
+  if (!props.card.description) return ''
+  return marked(props.card.description)
+})
 </script>
 
 <template>
@@ -20,9 +27,9 @@ defineProps<{
         {{ tag.name }}
       </span>
     </div>
-    <p v-if="card.description">
-      {{ card.description }}
-    </p>
+
+    <div v-if="card.description" class="card-description" v-html="parsedDescription"></div>
+
     <p v-if="card.deadline" :class="{ overdue: card.deadline < Date.now() }" class="deadline">
       {{ formatDate(card.deadline) }}
     </p>
@@ -76,12 +83,6 @@ defineProps<{
   margin: 0 0 4px;
   font-size: 14px;
   color: var(--text-primary);
-}
-
-.kanban-card p {
-  margin: 0;
-  font-size: 12px;
-  color: var(--text-secondary);
 }
 
 .priority-dot {
@@ -162,5 +163,52 @@ defineProps<{
   color: var(--text-secondary);
   margin-top: 4px;
   display: inline-block;
+}
+
+.card-description {
+  font-size: 12px;
+  color: var(--text-secondary);
+  max-height: 60px;
+  overflow: hidden;
+  line-height: 1.4;
+}
+
+.card-description :deep(p) {
+  margin: 0 0 4px;
+}
+
+.card-description :deep(h1),
+.card-description :deep(h2),
+.card-description :deep(h3) {
+  font-size: 12px;
+  margin: 0 0 4px;
+}
+
+.card-description :deep(ul),
+.card-description :deep(ol) {
+  margin: 0;
+  padding-left: 16px;
+}
+
+.card-description :deep(code) {
+  background: var(--bg-input);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 11px;
+}
+
+.card-description :deep(pre) {
+  background: var(--bg-input);
+  padding: 6px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 0 0 4px;
+}
+
+.card-description :deep(blockquote) {
+  border-left: 2px solid var(--accent);
+  margin: 0 0 4px;
+  padding-left: 8px;
+  color: var(--text-secondary);
 }
 </style>

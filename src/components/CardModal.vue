@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import type { Card, Comment, SubTask, Tag } from '@/types'
 import { useHistory } from '@/composables/useHistory'
 import { availableTags } from '@/data/tags'
 import { useToast } from '@/composables/useToast'
 import { formatDate } from '@/utils/format'
+import { marked } from 'marked'
 
 const props = defineProps<{
   card: Card
@@ -16,22 +17,15 @@ const emit = defineEmits<{
   delete: [id: string]
 }>()
 
-const overlayRef = ref<HTMLElement | null>(null)
-
-onMounted(() => {
-  overlayRef.value?.focus()
-})
-
-const { addHistory } = useHistory()
-
 const priorityLabels: Record<Card['priority'], string> = {
   low: 'Низкий',
   medium: 'Средний',
   high: 'Высокий',
 }
 
+const overlayRef = ref<HTMLElement | null>(null)
+const { addHistory } = useHistory()
 const isEditing = ref(false)
-
 const editTitle = ref('')
 const editDescription = ref('')
 const editDeadline = ref('')
@@ -39,6 +33,15 @@ const editSubTask = ref<SubTask[]>([])
 const newSubTask = ref('')
 const newComment = ref('')
 const { addToast } = useToast()
+
+onMounted(() => {
+  overlayRef.value?.focus()
+})
+
+const parsedDescription = computed(() => {
+  if (!props.card.description) return ''
+  return marked(props.card.description)
+})
 
 function startEditing() {
   editTitle.value = props.card.title
@@ -199,9 +202,7 @@ function archivedCard() {
             </span>
           </div>
 
-          <p v-if="card.description" class="modal-description">
-            {{ card.description }}
-          </p>
+          <div v-if="card.description" class="modal-description" v-html="parsedDescription"></div>
           <p v-else class="modal-description empty">Нет описания</p>
 
           <div
@@ -264,7 +265,12 @@ function archivedCard() {
 
           <div class="edit-field">
             <label>Описание</label>
-            <textarea v-model="editDescription" class="textarea" rows="3" />
+            <textarea
+              v-model="editDescription"
+              class="textarea"
+              rows="3"
+              placeholder="Поддерживается Markdown: **жирный**, *курсив*, # заголовок, - список, `код`"
+            />
           </div>
 
           <div class="edit-field">
@@ -526,5 +532,52 @@ function archivedCard() {
 
 .comment-add button {
   margin-top: 6px;
+}
+
+.modal-description :deep(h1),
+.modal-description :deep(h2),
+.modal-description :deep(h3) {
+  margin: 8px 0 4px;
+}
+
+.modal-description :deep(p) {
+  margin: 0 0 8px;
+}
+
+.modal-description :deep(ul),
+.modal-description :deep(ol) {
+  margin: 0 0 8px;
+  padding-left: 20px;
+}
+
+.modal-description :deep(code) {
+  background: var(--bg-input);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+.modal-description :deep(pre) {
+  background: var(--bg-input);
+  padding: 12px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 0 0 8px;
+}
+
+.modal-description :deep(pre code) {
+  padding: 0;
+  background: none;
+}
+
+.modal-description :deep(a) {
+  color: var(--accent);
+}
+
+.modal-description :deep(blockquote) {
+  border-left: 3px solid var(--accent);
+  margin: 0 0 8px;
+  padding-left: 12px;
+  color: var(--text-secondary);
 }
 </style>
