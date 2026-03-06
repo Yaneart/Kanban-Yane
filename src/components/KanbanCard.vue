@@ -16,6 +16,9 @@ const parsedDescription = computed(() => {
 
 <template>
   <div :class="['kanban-card', card.priority]">
+    <div class="drag-handle">
+      <span class="grip-lines"></span>
+    </div>
     <h4>{{ card.title }}</h4>
     <div v-if="card.tags?.length" class="card-tags">
       <span
@@ -51,11 +54,11 @@ const parsedDescription = computed(() => {
   position: relative;
   background: var(--bg-card);
   border-radius: 8px;
-  padding: 8px 12px;
+  padding: 8px 12px 8px 28px;
   margin-bottom: 8px;
   box-shadow: 0 1px 3px var(--shadow);
   border-left: 4px solid;
-  cursor: grab;
+  cursor: pointer;
   transition:
     box-shadow 0.2s,
     transform 0.15s;
@@ -65,6 +68,60 @@ const parsedDescription = computed(() => {
   box-shadow: 0 4px 12px var(--shadow-hover);
   transform: translateY(-1px);
   background: var(--bg-card-hover);
+}
+
+.drag-handle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  opacity: 0;
+  transition: opacity 0.2s;
+  touch-action: none;
+  user-select: none;
+  border-radius: 8px 0 0 8px;
+}
+
+.grip-lines {
+  width: 4px;
+  height: 16px;
+  background-image: radial-gradient(circle, var(--text-muted) 1px, transparent 1px);
+  background-size: 4px 4px;
+}
+
+.kanban-card:hover .drag-handle {
+  opacity: 0.6;
+}
+
+.drag-handle:hover {
+  opacity: 1 !important;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+@media (max-width: 768px) {
+  .kanban-card {
+    padding: 10px 14px 10px 32px;
+  }
+
+  .drag-handle {
+    opacity: 0.5;
+    width: 28px;
+  }
+
+  .grip-lines {
+    width: 6px;
+    height: 20px;
+    background-size: 6px 6px;
+  }
 }
 
 .kanban-card.low {

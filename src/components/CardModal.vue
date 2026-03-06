@@ -595,4 +595,94 @@ function duplicateCard() {
   padding-left: 12px;
   color: var(--text-secondary);
 }
+
+/* ===== Mobile ===== */
+@media (max-width: 768px) {
+  .modal-overlay {
+    align-items: flex-end;
+  }
+
+  .modal-content {
+    width: 100%;
+    max-width: 100%;
+    max-height: 92vh;
+    border-radius: 16px 16px 0 0;
+    padding: 20px 16px;
+    padding-top: 12px;
+  }
+
+  .modal-content::before {
+    content: '';
+    display: block;
+    width: 36px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    margin: 0 auto 12px;
+  }
+
+  .modal-close {
+    top: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .modal-header {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-right: 40px;
+  }
+
+  .modal-header h2 {
+    font-size: 1.15rem;
+    width: 100%;
+  }
+
+  .modal-tags {
+    gap: 8px;
+  }
+
+  .tag-badge {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+  }
+
+  .modal-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .modal-actions .btn {
+    padding: 12px 8px;
+    font-size: 13px;
+    text-align: center;
+    justify-content: center;
+    white-space: nowrap;
+  }
+
+  .subtask-item {
+    padding: 8px 0;
+  }
+
+  .subtask-item input[type='checkbox'] {
+    width: 20px;
+    height: 20px;
+  }
+
+  .comment-add textarea {
+    font-size: 16px;
+  }
+
+  .edit-field input,
+  .edit-field textarea {
+    font-size: 16px;
+    padding: 10px 12px;
+  }
+}
 </style>

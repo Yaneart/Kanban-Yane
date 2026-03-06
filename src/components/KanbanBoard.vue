@@ -2,7 +2,7 @@
 import type { Board, Column } from '@/types'
 import KanbanColumn from './KanbanColumn.vue'
 import draggable from 'vuedraggable'
-import { computed, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { provideHistory } from '@/composables/useHistory'
 import { useThemeStore } from '@/stores/theme'
 import { useToast } from '@/composables/useToast'
@@ -26,8 +26,19 @@ const themeStore = useThemeStore()
 const showArchive = ref(false)
 const { addToast } = useToast()
 const showBgPicker = ref(false)
+const showMenu = ref(false)
 const { backgrounds, boardStyle, setBackground, resetBackground } = useBackground(props.board)
 const { exportBoard, importBoard } = useBoardActions(props.board, emit, addHistory)
+
+function onClickOutside(event: MouseEvent) {
+  const target = event.target as HTMLElement
+  if (!target.closest('.dropdown-wrapper')) {
+    showMenu.value = false
+  }
+}
+
+onMounted(() => document.addEventListener('click', onClickOutside))
+onUnmounted(() => document.removeEventListener('click', onClickOutside))
 
 function addColumn() {
   const title = newColumnTitle.value.trim()
@@ -93,19 +104,91 @@ function restoreCard(columnId: string, cardId: string) {
   <div class="kanban-board" :style="boardStyle">
     <!-- Header -->
     <header class="board-header">
-      <RouterLink to="/" class="back-btn">← Назад</RouterLink>
+      <RouterLink to="/" class="back-btn" title="На главную">←</RouterLink>
+      <div class="header-divider"></div>
       <h1 class="board-title">{{ board.title }}</h1>
-      <input v-model="searchQuery" class="input search-input" placeholder="Поиск карточек..." />
+
+      <div class="header-center">
+        <div class="search-wrapper">
+          <span class="search-icon">🔍</span>
+          <input v-model="searchQuery" class="search-input" placeholder="Поиск..." />
+        </div>
+      </div>
+
       <div class="header-actions">
-        <button class="btn btn-danger" @click="resetBoard">Сбросить</button>
-        <button class="btn btn-primary" @click="showHistory = !showHistory">История</button>
-        <button class="btn btn-primary" @click="showArchive = !showArchive">Архив</button>
-        <button class="btn btn-primary" @click="showBgPicker = !showBgPicker">Фон</button>
-        <button class="btn btn-primary" @click="themeStore.toggleTheme()">
+        <div class="btn-group">
+          <button
+            class="action-btn"
+            :class="{ active: showBgPicker }"
+            title="Фон доски"
+            @click="showBgPicker = !showBgPicker"
+          >
+            🎨 <span class="action-label">Фон</span>
+          </button>
+          <button
+            class="action-btn"
+            :class="{ active: showHistory }"
+            title="История действий"
+            @click="showHistory = !showHistory"
+          >
+            📋 <span class="action-label">История</span>
+          </button>
+          <button
+            class="action-btn"
+            :class="{ active: showArchive }"
+            title="Архив карточек"
+            @click="showArchive = !showArchive"
+          >
+            📦 <span class="action-label">Архив</span>
+          </button>
+        </div>
+
+        <button class="action-btn theme-btn" title="Сменить тему" @click="themeStore.toggleTheme()">
           {{ themeStore.theme === 'dark' ? '☀️' : '🌙' }}
         </button>
-        <button class="btn btn-primary" @click="exportBoard">Экспорт</button>
-        <button class="btn btn-primary" @click="importBoard">Импорт</button>
+
+        <div class="dropdown-wrapper">
+          <button
+            class="action-btn"
+            :class="{ active: showMenu }"
+            title="Дополнительно"
+            @click="showMenu = !showMenu"
+          >
+            ⋮
+          </button>
+          <Transition name="fade">
+            <div v-if="showMenu" class="dropdown-menu">
+              <button
+                class="dropdown-item"
+                @click="
+                  exportBoard()
+                  showMenu = false
+                "
+              >
+                <span>📥</span> Экспорт доски
+              </button>
+              <button
+                class="dropdown-item"
+                @click="
+                  importBoard()
+                  showMenu = false
+                "
+              >
+                <span>📤</span> Импорт доски
+              </button>
+              <div class="dropdown-separator"></div>
+              <button
+                class="dropdown-item danger"
+                @click="
+                  resetBoard()
+                  showMenu = false
+                "
+              >
+                <span>🗑️</span> Сбросить доску
+              </button>
+            </div>
+          </Transition>
+        </div>
       </div>
     </header>
 
@@ -135,7 +218,10 @@ function restoreCard(columnId: string, cardId: string) {
           class="column-list"
           ghost-class="column-ghost"
           drag-class="column-dragging"
+          handle=".column-drag-handle"
           :animation="200"
+          :delay="100"
+          :delay-on-touch-only="true"
         >
           <template #item="{ element }">
             <KanbanColumn
@@ -203,34 +289,237 @@ function restoreCard(columnId: string, cardId: string) {
 .board-header {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 16px 20px;
-  background: rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(10px);
+  gap: 10px;
+  padding: 10px 16px;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 16px;
+  transition:
+    background 0.2s,
+    color 0.2s;
+  flex-shrink: 0;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.header-divider {
+  width: 1px;
+  height: 22px;
+  background: rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
 }
 
 .board-title {
   margin: 0;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--text-primary);
   white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.header-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+
+.search-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 240px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  pointer-events: none;
+  opacity: 0.6;
 }
 
 .search-input {
-  flex: 1;
-  max-width: 300px;
-  background: var(--bg-input-alt);
+  width: 100%;
+  padding: 7px 12px 7px 30px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 13px;
+  outline: none;
+  transition: all 0.25s;
+}
+
+.search-input::placeholder {
+  color: var(--text-secondary);
+  font-size: 13px;
 }
 
 .search-input:focus {
-  background: var(--bg-input-focus-strong);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
+  max-width: 300px;
 }
 
+/* ===== Header Actions ===== */
 .header-actions {
   display: flex;
-  gap: 8px;
-  margin-left: auto;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.btn-group {
+  display: flex;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 32px;
+  padding: 0 10px;
+  background: none;
+  border: none;
+  border-radius: 7px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.action-btn.active {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.35);
+}
+
+.action-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.theme-btn {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 8px;
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.theme-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: rotate(20deg);
+}
+
+/* ===== Dropdown ===== */
+.dropdown-wrapper {
+  position: relative;
+}
+
+.dropdown-wrapper > .action-btn {
+  width: 34px;
+  padding: 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--bg-column);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 6px;
+  min-width: 200px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  z-index: 100;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 14px;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.dropdown-item.danger {
+  color: var(--danger);
+}
+
+.dropdown-item.danger:hover {
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.dropdown-separator {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 4px 8px;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition:
+    opacity 0.15s,
+    transform 0.15s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
 }
 
 /* ===== Body ===== */
@@ -346,22 +635,6 @@ function restoreCard(columnId: string, cardId: string) {
   transform: translateX(100%);
 }
 
-.back-btn {
-  color: var(--text-secondary);
-  text-decoration: none;
-  font-size: 14px;
-  padding: 8px 12px;
-  border-radius: 6px;
-  transition:
-    background 0.2s,
-    color 0.2s;
-}
-
-.back-btn:hover {
-  background: var(--bg-hover);
-  color: var(--text-primary);
-}
-
 .archive-item {
   display: flex;
   align-items: center;
@@ -434,37 +707,91 @@ function restoreCard(columnId: string, cardId: string) {
 @media (max-width: 768px) {
   .board-header {
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 6px;
+    padding: 8px 10px;
+  }
+
+  .back-btn {
+    width: 32px;
+    height: 32px;
   }
 
   .board-title {
-    font-size: 18px;
+    font-size: 14px;
+    white-space: normal;
+    flex: 0 1 auto;
+    max-width: 120px;
+    line-height: 1.2;
   }
 
-  .search-input {
+  .header-center {
     order: 1;
     flex: 1 1 100%;
+  }
+
+  .search-wrapper {
     max-width: none;
   }
 
+  .search-input {
+    padding: 10px 12px 10px 30px;
+    font-size: 16px;
+  }
+
+  .header-divider {
+    display: none;
+  }
+
   .header-actions {
-    margin-left: 0;
+    gap: 4px;
+  }
+
+  .btn-group {
+    padding: 2px;
+    gap: 1px;
+  }
+
+  .action-btn {
+    height: 34px;
+    padding: 0 8px;
+    font-size: 15px;
+  }
+
+  .action-label {
+    display: none;
+  }
+
+  .theme-btn,
+  .dropdown-wrapper > .action-btn {
+    width: 34px;
+    height: 34px;
   }
 
   .board-content {
-    padding: 12px;
-    gap: 12px;
+    padding: 12px 8px;
+    gap: 10px;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
   }
 
   .column-list {
-    gap: 12px;
+    gap: 10px;
   }
 
   .board-content :deep(.kanban-column) {
     scroll-snap-align: start;
-    min-width: 260px;
+    min-width: 82vw;
+    width: 82vw;
+  }
+
+  .board-content :deep(.column-drag-handle) {
+    opacity: 0.5;
+    font-size: 16px;
+    padding: 8px;
+  }
+
+  .add-column {
+    min-width: 82vw;
   }
 
   .history-panel {
@@ -472,6 +799,8 @@ function restoreCard(columnId: string, cardId: string) {
     top: 0;
     right: 0;
     height: 100vh;
+    width: 85vw;
+    min-width: auto;
     z-index: 100;
     box-shadow: -4px 0 20px rgba(0, 0, 0, 0.4);
   }

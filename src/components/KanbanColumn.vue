@@ -151,14 +151,17 @@ function duplicateCard(card: Card) {
           @keyup.escape="cancelEdit"
         />
       </template>
-      <h3 v-else @dblclick="startEditing">
-        {{ column.title }}
-        <span class="count"
-          >({{ activeCards.length
-          }}<template v-if="column.wipLimit">/ {{ column.wipLimit }}</template
-          >)</span
-        >
-      </h3>
+      <div v-else class="column-title-row">
+        <span class="column-drag-handle">⠿</span>
+        <h3 @dblclick="startEditing">
+          {{ column.title }}
+          <span class="count"
+            >({{ activeCards.length
+            }}<template v-if="column.wipLimit">/ {{ column.wipLimit }}</template
+            >)</span
+          >
+        </h3>
+      </div>
       <button class="btn-icon delete-column-btn" @click="emit('delete', column.id)">✕</button>
     </div>
     <div v-if="column.wipLimit" class="progress-bar">
@@ -197,7 +200,10 @@ function duplicateCard(card: Card) {
       class="cards-list"
       ghost-class="ghost"
       drag-class="dragging"
+      handle=".drag-handle"
       :animation="200"
+      :delay="100"
+      :delay-on-touch-only="true"
       :move="onDragMove"
       :data-wip-limit="column.wipLimit || 0"
       :data-active-count="activeCards.length"
@@ -246,6 +252,33 @@ function duplicateCard(card: Card) {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 12px;
+}
+
+.column-title-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.column-drag-handle {
+  font-size: 14px;
+  color: var(--text-muted);
+  cursor: grab;
+  opacity: 0;
+  transition: opacity 0.2s;
+  padding: 4px;
+  touch-action: none;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.kanban-column:hover .column-drag-handle {
+  opacity: 0.5;
+}
+
+.column-drag-handle:hover {
+  opacity: 1 !important;
 }
 
 .column-header h3 {
@@ -405,5 +438,39 @@ function duplicateCard(card: Card) {
   border: 2px dashed var(--bg-hover);
   border-radius: 8px;
   opacity: 0.7;
+}
+
+/* ===== Mobile ===== */
+@media (max-width: 768px) {
+  .kanban-column {
+    width: auto;
+    padding: 10px;
+  }
+
+  .column-header h3 {
+    font-size: 15px;
+    padding: 6px 8px;
+  }
+
+  .add-card input {
+    padding: 10px 12px;
+    font-size: 16px;
+  }
+
+  .add-card button {
+    padding: 10px 16px;
+    font-size: 18px;
+  }
+
+  .sort-select {
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  .delete-column-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
 }
 </style>
