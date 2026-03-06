@@ -15,6 +15,7 @@ const emit = defineEmits<{
   close: []
   update: [card: Card]
   delete: [id: string]
+  duplicate: [card: Card]
 }>()
 
 const priorityLabels: Record<Card['priority'], string> = {
@@ -163,6 +164,19 @@ function archivedCard() {
   addToast('Карточка архивирована', 'info')
   emit('close')
 }
+
+function duplicateCard() {
+  const copy: Card = {
+    ...JSON.parse(JSON.stringify(props.card)),
+    id: crypto.randomUUID(),
+    title: props.card.title + ' (копия)',
+    createdAt: Date.now(),
+  }
+  emit('duplicate', copy)
+  addHistory(`Скопирована карточка "${props.card.title}"`)
+  addToast('Карточка скопирована', 'success')
+  emit('close')
+}
 </script>
 
 <template>
@@ -246,6 +260,7 @@ function archivedCard() {
 
           <div class="modal-actions">
             <button class="btn btn-accent" @click="startEditing">Редактировать</button>
+            <button class="btn btn-primary" @click="duplicateCard">Копировать</button>
             <button class="btn btn-primary" @click="archivedCard">Архив</button>
             <button class="btn btn-danger" @click="emit('delete', card.id)">Удалить</button>
           </div>

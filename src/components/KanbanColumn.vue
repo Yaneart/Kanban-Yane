@@ -133,6 +133,10 @@ function onDragMove(event: any) {
   }
   return true
 }
+
+function duplicateCard(card: Card) {
+  props.column.cards.push(card)
+}
 </script>
 
 <template>
@@ -219,6 +223,7 @@ function onDragMove(event: any) {
       @close="selectedCard = null"
       @update="updateCard"
       @delete="deleteCardFromModal"
+      @duplicate="duplicateCard"
     />
   </div>
 </template>
