@@ -4,9 +4,9 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   plugins: [vue(), vueDevTools()],
-  base: 'Kanban-Yane',
+  base: command === 'serve' ? '/' : '/Kanban-Yane/',
   server: {
     host: '0.0.0.0',
     port: 5173,
@@ -16,4 +16,4 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
-})
+}))
