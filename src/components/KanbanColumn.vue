@@ -10,10 +10,12 @@ import { useToast } from '@/composables/useToast'
 const props = defineProps<{
   column: Column
   searchQuery: string
+  allColumns: { id: string; title: string }[]
 }>()
 
 const emit = defineEmits<{
   delete: [id: string]
+  move: [cardId: string, sourceColumnId: string, targetColumnId: string]
 }>()
 
 const newCardTitle = ref('')
@@ -134,6 +136,11 @@ function onDragMove(event: any) {
   return true
 }
 
+function moveCard(cardId: string, targetColumnId: string) {
+  emit('move', cardId, props.column.id, targetColumnId)
+  selectedCard.value = null
+}
+
 function duplicateCard(card: Card) {
   props.column.cards.push(card)
 }
@@ -226,10 +233,13 @@ function duplicateCard(card: Card) {
     <CardModal
       v-if="selectedCard"
       :card="selectedCard"
+      :columns="allColumns"
+      :current-column-id="column.id"
       @close="selectedCard = null"
       @update="updateCard"
       @delete="deleteCardFromModal"
       @duplicate="duplicateCard"
+      @move="moveCard"
     />
   </div>
 </template>

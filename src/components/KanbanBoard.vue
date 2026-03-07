@@ -102,6 +102,23 @@ const archivedCards = computed(() => {
   )
 })
 
+const columnsList = computed(() =>
+  props.board.columns.map((c) => ({ id: c.id, title: c.title })),
+)
+
+function moveCard(cardId: string, sourceColumnId: string, targetColumnId: string) {
+  const sourceCol = props.board.columns.find((c) => c.id === sourceColumnId)
+  const targetCol = props.board.columns.find((c) => c.id === targetColumnId)
+  if (!sourceCol || !targetCol) return
+
+  const cardIndex = sourceCol.cards.findIndex((c) => c.id === cardId)
+  if (cardIndex === -1) return
+
+  const [card] = sourceCol.cards.splice(cardIndex, 1)
+  if (!card) return
+  targetCol.cards.push(card)
+}
+
 function restoreCard(columnId: string, cardId: string) {
   const column = props.board.columns.find((c) => c.id === columnId)
   if (!column) return
@@ -225,7 +242,9 @@ function restoreCard(columnId: string, cardId: string) {
               :key="element.id"
               :search-query="searchQuery"
               :column="element"
+              :all-columns="columnsList"
               @delete="deleteColumn"
+              @move="moveCard"
             />
           </template>
         </draggable>

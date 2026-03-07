@@ -9,6 +9,8 @@ import { marked } from 'marked'
 
 const props = defineProps<{
   card: Card
+  columns: { id: string; title: string }[]
+  currentColumnId: string
 }>()
 
 const emit = defineEmits<{
@@ -16,6 +18,7 @@ const emit = defineEmits<{
   update: [card: Card]
   delete: [id: string]
   duplicate: [card: Card]
+  move: [cardId: string, targetColumnId: string]
 }>()
 
 const priorityLabels: Record<Card['priority'], string> = {
@@ -165,6 +168,18 @@ function archivedCard() {
   emit('close')
 }
 
+const moveTargetColumns = computed(() =>
+  props.columns.filter((c) => c.id !== props.currentColumnId),
+)
+
+function moveCard(targetColumnId: string) {
+  emit('move', props.card.id, targetColumnId)
+  const targetCol = props.columns.find((c) => c.id === targetColumnId)
+  addHistory(`Карточка "${props.card.title}" перемещена в "${targetCol?.title}"`)
+  addToast('Карточка перемещена', 'success')
+  emit('close')
+}
+
 function duplicateCard() {
   const copy: Card = {
     ...JSON.parse(JSON.stringify(props.card)),
@@ -253,6 +268,20 @@ function duplicateCard() {
                 @keydown.ctrl.enter="addComment"
               />
               <button class="btn btn-accent btn-sm" @click="addComment">Отправить</button>
+            </div>
+          </div>
+
+          <div v-if="moveTargetColumns.length" class="modal-move">
+            <h3>Переместить в</h3>
+            <div class="move-buttons">
+              <button
+                v-for="col in moveTargetColumns"
+                :key="col.id"
+                class="btn btn-primary btn-sm"
+                @click="moveCard(col.id)"
+              >
+                {{ col.title }}
+              </button>
             </div>
           </div>
 
@@ -424,6 +453,21 @@ function duplicateCard() {
 .subtask-item .done {
   text-decoration: line-through;
   color: var(--text-secondary);
+}
+
+.modal-move {
+  margin-bottom: 16px;
+}
+
+.modal-move h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.move-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .modal-meta {
