@@ -24,5 +24,13 @@ export const useBoardsStore = defineStore('boards', () => {
     }
   }
 
-  return { boards, addBoard, deleteBoard, getBoard, updateBoard }
+  function toggleFavorite(id: string) {
+    const board = boards.value.find((e) => e.id === id)
+
+    if (board) {
+      board.favorite = !board.favorite
+    }
+  }
+
+  return { boards, addBoard, deleteBoard, getBoard, updateBoard, toggleFavorite }
 })

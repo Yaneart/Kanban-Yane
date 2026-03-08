@@ -24,6 +24,7 @@ export interface Board {
   title: string
   columns: Column[]
   background?: string
+  favorite?: boolean
 }
 //История действий
 export interface HistoryEntry {

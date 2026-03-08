@@ -11,17 +11,19 @@ const themeStore = useThemeStore()
 const { addToast } = useToast()
 
 const boardStats = computed(() => {
-  return boardsStore.boards.map((board) => {
-    const totalCards = board.columns.reduce(
-      (sum, col) => sum + col.cards.filter((c) => !c.archived).length,
-      0,
-    )
-    return {
-      ...board,
-      columnCount: board.columns.length,
-      cardCount: totalCards,
-    }
-  })
+  return boardsStore.boards
+    .map((board) => {
+      const totalCards = board.columns.reduce(
+        (sum, col) => sum + col.cards.filter((c) => !c.archived).length,
+        0,
+      )
+      return {
+        ...board,
+        columnCount: board.columns.length,
+        cardCount: totalCards,
+      }
+    })
+    .sort((a, b) => Number(b.favorite) - Number(a.favorite))
 })
 
 function createBoard() {
@@ -76,6 +78,13 @@ function deleteBoard(id: string) {
           class="board-card"
         >
           <button class="board-delete" @click.prevent="deleteBoard(board.id)">✕</button>
+          <button
+            class="board-favorite"
+            :class="{ active: board.favorite }"
+            @click.prevent="boardsStore.toggleFavorite(board.id)"
+          >
+            {{ board.favorite ? '★' : '☆' }}
+          </button>
           <div class="board-card-content">
             <h3 class="board-name">{{ board.title }}</h3>
             <div class="board-stats">
@@ -398,6 +407,40 @@ function deleteBoard(id: string) {
 .create-btn:hover {
   background: #7c3aed;
   box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+.board-favorite {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.2s;
+  z-index: 2;
+}
+
+.board-card:hover .board-favorite {
+  opacity: 1;
+}
+
+.board-favorite.active {
+  opacity: 1;
+  color: #f59e0b;
+}
+
+.board-favorite:hover {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.15);
 }
 
 /* ===== Mobile ===== */
