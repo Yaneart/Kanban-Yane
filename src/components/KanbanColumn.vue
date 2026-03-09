@@ -177,14 +177,12 @@ function duplicateCard(card: Card) {
       </template>
       <div v-else class="column-title-row">
         <span class="column-drag-handle">⠿</span>
-        <h3 @dblclick="startEditing">
-          {{ column.title }}
-          <span class="count"
-            >({{ activeCards.length
-            }}<template v-if="column.wipLimit">/ {{ column.wipLimit }}</template
-            >)</span
-          >
-        </h3>
+        <span class="col-dot"></span>
+        <h3 @dblclick="startEditing">{{ column.title }}</h3>
+        <span class="col-count"
+          >{{ activeCards.length
+          }}<template v-if="column.wipLimit">/{{ column.wipLimit }}</template></span
+        >
       </div>
       <button class="btn-icon delete-column-btn" @click="emit('delete', column.id)">✕</button>
     </div>
@@ -224,7 +222,6 @@ function duplicateCard(card: Card) {
       class="cards-list"
       ghost-class="ghost"
       drag-class="dragging"
-      handle=".drag-handle"
       :animation="200"
       :delay="100"
       :delay-on-touch-only="true"
@@ -252,7 +249,12 @@ function duplicateCard(card: Card) {
         v-if="selectedTemplate"
         class="btn-icon template-delete"
         title="Удалить шаблон"
-        @click="templateStore.deleteTemplate(selectedTemplate); selectedTemplate = ''"
+        @click="
+          () => {
+            templateStore.deleteTemplate(selectedTemplate)
+            selectedTemplate = ''
+          }
+        "
       >
         ✕
       </button>
@@ -277,33 +279,81 @@ function duplicateCard(card: Card) {
 
 <style scoped>
 .kanban-column {
-  background: var(--bg-column);
-  border-radius: 12px;
-  padding: 12px;
-  width: 280px;
+  background: transparent;
+  border-right: 1px solid rgba(255, 255, 255, 0.025);
+  padding: 20px 16px;
+  flex: 1;
+  min-width: 240px;
   min-height: 100px;
-  flex-shrink: 0;
-  max-height: 80vh;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  position: relative;
+}
+
+.kanban-column:last-child {
+  border-right: none;
+}
+
+/* цветная полоска сверху */
+.kanban-column {
+  --col-color: 139, 92, 246;
+}
+.kanban-column:nth-child(2) {
+  --col-color: 59, 130, 246;
+}
+.kanban-column:nth-child(3) {
+  --col-color: 236, 72, 153;
+}
+.kanban-column:nth-child(4) {
+  --col-color: 16, 185, 129;
+}
+.kanban-column:nth-child(5) {
+  --col-color: 245, 158, 11;
+}
+.kanban-column:nth-child(6) {
+  --col-color: 239, 68, 68;
+}
+.kanban-column:nth-child(7) {
+  --col-color: 6, 182, 212;
+}
+.kanban-column:nth-child(8) {
+  --col-color: 249, 115, 22;
+}
+.kanban-column:nth-child(9) {
+  --col-color: 34, 197, 94;
+}
+.kanban-column:nth-child(10) {
+  --col-color: 168, 85, 247;
+}
+
+.kanban-column::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, rgb(var(--col-color)), rgba(var(--col-color), 0.3));
 }
 
 .column-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+  padding-left: 2px;
 }
 
 .column-title-row {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 10px;
   min-width: 0;
 }
 
 .column-drag-handle {
-  font-size: 14px;
+  font-size: 12px;
   color: var(--text-muted);
   cursor: grab;
   opacity: 0;
@@ -322,23 +372,50 @@ function duplicateCard(card: Card) {
   opacity: 1 !important;
 }
 
+.col-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgb(var(--col-color));
+  box-shadow: 0 0 10px rgba(var(--col-color), 0.5);
+  flex-shrink: 0;
+}
+
 .column-header h3 {
   margin: 0;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
-  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #555;
   cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 4px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: all 0.2s;
 }
 
 .column-header h3:hover {
-  background: var(--bg-hover);
+  background: rgba(255, 255, 255, 0.04);
+  color: #888;
 }
 
-.column-header .count {
-  color: var(--text-secondary);
-  font-weight: 400;
+.col-count {
+  font-size: 10px;
+  color: #333;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: auto;
+}
+
+.delete-column-btn {
+  font-size: 14px;
+  opacity: 0;
+  transition: all 0.2s;
+}
+
+.kanban-column:hover .delete-column-btn {
+  opacity: 1;
 }
 
 .delete-column-btn:hover {
@@ -352,7 +429,7 @@ function duplicateCard(card: Card) {
 }
 
 .cards-list::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 
 .cards-list::-webkit-scrollbar-track {
@@ -360,24 +437,32 @@ function duplicateCard(card: Card) {
 }
 
 .cards-list::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
 }
 
 .cards-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .edit-input {
   width: 100%;
-  padding: 6px 8px;
-  font-size: 14px;
-  font-weight: 700;
-  border: 2px solid var(--accent);
-  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 8px;
   margin-bottom: 8px;
   box-sizing: border-box;
   outline: none;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
+}
+
+.edit-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-glow);
 }
 
 .edit-actions {
@@ -392,7 +477,13 @@ function duplicateCard(card: Card) {
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-top: 8px;
+  margin-top: 4px;
+  opacity: 0.4;
+  transition: opacity 0.2s;
+}
+
+.template-select:hover {
+  opacity: 0.8;
 }
 
 .template-select .sort-select {
@@ -412,123 +503,148 @@ function duplicateCard(card: Card) {
 
 .add-card {
   display: flex;
-  gap: 8px;
-  margin-top: 8px;
-  padding-top: 8px;
+  gap: 6px;
+  margin-top: 4px;
+  padding-top: 4px;
 }
 
 .add-card input {
   flex: 1;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  background: var(--bg-input);
+  padding: 10px 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  font-size: 12px;
+  font-family: 'Outfit', sans-serif;
+  background: transparent;
   color: var(--text-primary);
   outline: none;
+  text-align: center;
+  transition: all 0.2s;
 }
 
 .add-card input::placeholder {
-  color: var(--text-secondary);
+  color: #2a2a35;
 }
 
 .add-card input:focus {
-  box-shadow: 0 0 0 2px var(--accent-soft);
-  background: var(--bg-input-focus);
+  border-style: solid;
+  border-color: rgba(139, 92, 246, 0.2);
+  background: rgba(139, 92, 246, 0.03);
+  color: #888;
 }
 
 .add-card button {
-  padding: 8px 14px;
-  background: var(--accent-btn);
-  color: white;
-  border: none;
-  border-radius: 6px;
+  padding: 8px 12px;
+  background: transparent;
+  color: #2a2a35;
+  border: 1px dashed rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
-  transition: background 0.2s;
+  font-family: 'Outfit', sans-serif;
+  transition: all 0.2s;
 }
 
 .add-card button:hover {
-  background: var(--accent-btn-hover);
+  border-color: rgba(139, 92, 246, 0.2);
+  color: #555;
+  background: rgba(139, 92, 246, 0.03);
 }
 
 .kanban-column.over-limit {
-  border: 2px solid var(--danger);
+  box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.3);
 }
 
 .sort-select {
   width: 100%;
-  padding: 6px 8px;
+  padding: 5px 8px;
   border: none;
   border-radius: 6px;
-  font-size: 12px;
-  background: var(--bg-input);
-  color: var(--text-primary);
+  font-size: 10px;
+  font-family: 'Outfit', sans-serif;
+  background: transparent;
+  color: #333;
   outline: none;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   cursor: pointer;
+  transition: all 0.3s;
+  opacity: 0;
 }
+
+.kanban-column:hover .sort-select {
+  opacity: 0.6;
+}
+
+[data-theme='light'] .sort-select option {
+  background: #fff;
+  color: #333;
+}
+
+.sort-select:hover {
+  opacity: 1 !important;
+  color: #555;
+  background: rgba(255, 255, 255, 0.02);
+}
+
 .sort-select option {
-  background: var(--bg-column);
-  color: var(--text-primary);
+  background: #0d0d16;
+  color: #ccc;
 }
 
 .progress-bar {
-  height: 4px;
-  background: var(--bg-input);
-  border-radius: 2px;
-  margin-bottom: 8px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 1px;
+  margin-bottom: 12px;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background: var(--accent);
-  border-radius: 2px;
+  border-radius: 1px;
   transition: width 0.3s ease;
+  background: linear-gradient(90deg, rgb(var(--col-color)), rgba(var(--col-color), 0.3));
 }
 
 .progress-warning {
-  background: #f59e0b;
+  background: linear-gradient(90deg, #f59e0b, rgba(245, 158, 11, 0.3));
 }
 
 .progress-danger {
-  background: var(--danger);
+  background: linear-gradient(90deg, var(--danger), rgba(239, 68, 68, 0.3));
 }
 
 .cards-list :deep(.ghost) {
   opacity: 0.3;
   background: var(--accent-soft);
-  border-radius: 8px;
-  border-left-color: var(--accent);
+  border-radius: 14px;
 }
 
 .cards-list :deep(.dragging) {
   opacity: 0.9;
-  transform: rotate(3deg);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  transform: rotate(2deg);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
 }
 
 .empty-placeholder {
-  padding: 24px 12px;
+  padding: 20px 12px;
   text-align: center;
   color: var(--text-muted);
-  font-size: 13px;
-  border: 2px dashed var(--bg-hover);
-  border-radius: 8px;
-  opacity: 0.7;
+  font-size: 12px;
+  border: 1px dashed var(--border-medium);
+  border-radius: 12px;
 }
 
-/* ===== Mobile ===== */
+/* мобильная версия */
 @media (max-width: 768px) {
   .kanban-column {
-    width: auto;
-    padding: 10px;
+    min-width: auto;
+    padding: 14px 12px;
   }
 
   .column-header h3 {
-    font-size: 15px;
+    font-size: 13px;
     padding: 6px 8px;
   }
 
@@ -539,7 +655,7 @@ function duplicateCard(card: Card) {
 
   .add-card button {
     padding: 10px 16px;
-    font-size: 18px;
+    font-size: 16px;
   }
 
   .sort-select {
@@ -548,6 +664,7 @@ function duplicateCard(card: Card) {
   }
 
   .delete-column-btn {
+    opacity: 1;
     width: 44px;
     height: 44px;
     font-size: 18px;

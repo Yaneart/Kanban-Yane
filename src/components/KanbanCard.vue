@@ -1,73 +1,83 @@
 <script setup lang="ts">
 import type { Card } from '@/types'
 import { formatDate } from '@/utils/format'
-import { marked } from 'marked'
-import { computed } from 'vue'
 
-const props = defineProps<{
+defineProps<{
   card: Card
 }>()
-
-const parsedDescription = computed(() => {
-  if (!props.card.description) return ''
-  return marked(props.card.description)
-})
 </script>
 
 <template>
   <div :class="['kanban-card', card.priority]">
+    <div :class="['priority-dot', card.priority]"></div>
     <div class="drag-handle">
       <span class="grip-lines"></span>
     </div>
     <h4>{{ card.title }}</h4>
+
+    <p v-if="card.description" class="card-description">{{ card.description }}</p>
+
     <div v-if="card.tags?.length" class="card-tags">
       <span
         v-for="tag in card.tags"
         :key="tag.id"
         class="card-tag"
-        :style="{ background: tag.color }"
+        :style="{ '--tag-color': tag.color } as any"
       >
         {{ tag.name }}
       </span>
     </div>
 
-    <div v-if="card.description" class="card-description" v-html="parsedDescription"></div>
-
     <p v-if="card.deadline" :class="{ overdue: card.deadline < Date.now() }" class="deadline">
       {{ formatDate(card.deadline) }}
     </p>
-    <div :class="['priority-dot', card.priority]"></div>
-    <div v-if="card.subtask?.length" class="subtasks">
-      <span class="subtasks-progress">
-        {{ card.subtask.filter((s) => s.done).length }}/{{ card.subtask.length }}
-      </span>
-      <div v-for="sub in card.subtask" :key="sub.id" class="subtask-item">
-        <span :class="{ done: sub.done }">{{ sub.text }}</span>
-      </div>
+    <div v-if="card.subtask?.length" class="subtask-bar">
+      <div
+        v-for="sub in card.subtask"
+        :key="sub.id"
+        :class="['subtask-seg', { done: sub.done }]"
+      ></div>
     </div>
-    <span v-if="card.comments?.length" class="comment-count"> 💬 {{ card.comments.length }} </span>
+    <span v-if="card.comments?.length" class="comment-count">💬{{ card.comments.length }}</span>
   </div>
 </template>
 
 <style scoped>
 .kanban-card {
   position: relative;
-  background: var(--bg-card);
-  border-radius: 8px;
-  padding: 8px 12px 8px 28px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 14px;
+  padding: 16px;
+  padding-left: 32px;
   margin-bottom: 8px;
-  box-shadow: 0 1px 3px var(--shadow);
-  border-left: 4px solid;
   cursor: pointer;
-  transition:
-    box-shadow 0.2s,
-    transform 0.15s;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  transform-style: preserve-3d;
+}
+
+.kanban-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(var(--col-color), 0.06) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
 }
 
 .kanban-card:hover {
-  box-shadow: 0 4px 12px var(--shadow-hover);
-  transform: translateY(-1px);
-  background: var(--bg-card-hover);
+  background: rgba(var(--col-color), 0.04);
+  border-color: rgba(var(--col-color), 0.2);
+  transform: translateY(-3px) rotateX(1.5deg);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.3),
+    0 0 50px rgba(var(--col-color), 0.06);
+}
+
+.kanban-card:hover::after {
+  opacity: 1;
 }
 
 .drag-handle {
@@ -75,7 +85,7 @@ const parsedDescription = computed(() => {
   left: 0;
   top: 0;
   bottom: 0;
-  width: 22px;
+  width: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -84,13 +94,14 @@ const parsedDescription = computed(() => {
   transition: opacity 0.2s;
   touch-action: none;
   user-select: none;
-  border-radius: 8px 0 0 8px;
+  border-radius: 14px 0 0 14px;
+  z-index: 2;
 }
 
 .grip-lines {
   width: 4px;
   height: 16px;
-  background-image: radial-gradient(circle, var(--text-muted) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.2) 1px, transparent 1px);
   background-size: 4px 4px;
 }
 
@@ -100,7 +111,7 @@ const parsedDescription = computed(() => {
 
 .drag-handle:hover {
   opacity: 1 !important;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .drag-handle:active {
@@ -109,7 +120,7 @@ const parsedDescription = computed(() => {
 
 @media (max-width: 768px) {
   .kanban-card {
-    padding: 10px 14px 10px 32px;
+    padding: 14px 14px 14px 34px;
   }
 
   .drag-handle {
@@ -124,150 +135,150 @@ const parsedDescription = computed(() => {
   }
 }
 
+/* линия приоритета */
 .kanban-card.low {
-  border-left-color: var(--priority-low);
+  border-left: none;
 }
 
 .kanban-card.medium {
-  border-left-color: var(--priority-medium);
+  border-left: none;
 }
 
 .kanban-card.high {
-  border-left-color: var(--priority-high);
+  border-left: none;
 }
 
 .kanban-card h4 {
   margin: 0 0 4px;
-  font-size: 14px;
-  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--card-title);
+  position: relative;
+  z-index: 1;
 }
 
 .priority-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-top: 6px;
+  display: block;
+  width: 100%;
+  height: 2px;
+  margin: 6px 0 10px;
 }
 
 .priority-dot.low {
-  background: var(--priority-low);
+  background: linear-gradient(90deg, #22c55e, transparent);
 }
 
 .priority-dot.medium {
-  background: var(--priority-medium);
+  background: linear-gradient(90deg, #f59e0b, transparent);
 }
 
 .priority-dot.high {
-  background: var(--priority-high);
+  background: linear-gradient(90deg, #ef4444, transparent);
 }
 
 .deadline {
-  font-size: 11px;
-  color: var(--text-secondary);
-  margin: 4px 0 0;
+  font-size: 10px;
+  color: #444;
+  margin: 6px 0 0;
+  position: relative;
+  z-index: 1;
 }
 
 .deadline.overdue {
-  color: var(--danger);
+  color: #ef4444;
   font-weight: 600;
 }
 
-.subtasks {
-  margin-top: 8px;
-  border-top: 1px solid var(--bg-hover);
-  padding-top: 6px;
-}
-
-.subtasks-progress {
-  font-size: 11px;
-  color: var(--text-muted);
-  font-weight: 600;
-}
-
-.subtask-item {
+.subtask-bar {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--text-secondary);
-  padding: 2px 0;
+  gap: 3px;
+  margin-top: 10px;
+  position: relative;
+  z-index: 1;
 }
 
-.subtask-item .done {
-  text-decoration: line-through;
-  opacity: 0.5;
+.subtask-seg {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.subtask-seg.done {
+  background: rgb(var(--col-color));
 }
 
 .card-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-  margin-bottom: 4px;
+  margin-top: 6px;
+  position: relative;
+  z-index: 1;
 }
 
 .card-tag {
-  padding: 1px 6px;
-  border-radius: 8px;
+  padding: 3px 8px;
+  border-radius: 6px;
   font-size: 10px;
   font-weight: 600;
-  color: #fff;
-  text-transform: uppercase;
+  text-transform: none;
+  color: var(--tag-color);
+  background: color-mix(in srgb, var(--tag-color) 12%, transparent);
+}
+
+[data-theme='light'] .card-tag {
+  background: color-mix(in srgb, var(--tag-color) 15%, white);
+  border: 1px solid color-mix(in srgb, var(--tag-color) 30%, transparent);
+  font-weight: 700;
 }
 
 .comment-count {
-  font-size: 11px;
-  color: var(--text-secondary);
-  margin-top: 4px;
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 6px;
   display: inline-block;
+  position: relative;
+  z-index: 1;
 }
 
 .card-description {
-  font-size: 12px;
-  color: var(--text-secondary);
-  max-height: 60px;
+  font-size: 11px;
+  color: var(--card-desc);
+  max-height: 40px;
   overflow: hidden;
-  line-height: 1.4;
+  line-height: 1.5;
   word-break: break-word;
   overflow-wrap: break-word;
-}
-
-.card-description :deep(p) {
-  margin: 0 0 4px;
-}
-
-.card-description :deep(h1),
-.card-description :deep(h2),
-.card-description :deep(h3) {
-  font-size: 12px;
-  margin: 0 0 4px;
-}
-
-.card-description :deep(ul),
-.card-description :deep(ol) {
+  position: relative;
+  z-index: 1;
   margin: 0;
-  padding-left: 16px;
 }
 
-.card-description :deep(code) {
-  background: var(--bg-input);
-  padding: 1px 4px;
-  border-radius: 3px;
-  font-size: 11px;
+/* светлая тема */
+[data-theme='light'] .kanban-card {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-.card-description :deep(pre) {
-  background: var(--bg-input);
-  padding: 6px;
-  border-radius: 4px;
-  overflow: hidden;
-  margin: 0 0 4px;
+[data-theme='light'] .kanban-card:hover {
+  background: rgba(var(--col-color), 0.08);
+  border-color: rgba(var(--col-color), 0.35);
+  box-shadow:
+    0 8px 24px rgba(var(--col-color), 0.15),
+    0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-.card-description :deep(blockquote) {
-  border-left: 2px solid var(--accent);
-  margin: 0 0 4px;
-  padding-left: 8px;
-  color: var(--text-secondary);
+[data-theme='light'] .kanban-card::after {
+  background: linear-gradient(135deg, rgba(var(--col-color), 0.12) 0%, transparent 60%);
+}
+
+[data-theme='light'] .grip-lines {
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.2) 1px, transparent 1px);
+}
+
+[data-theme='light'] .drag-handle:hover {
+  background: rgba(0, 0, 0, 0.04);
 }
 </style>

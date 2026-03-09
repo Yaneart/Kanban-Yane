@@ -1,4 +1,4 @@
-// Карточка задачи
+// карточка
 export interface Card {
   id: string
   title: string
@@ -11,14 +11,14 @@ export interface Card {
   comments?: Comment[]
   archived?: boolean
 }
-// Колонка с задачами
+// колонка
 export interface Column {
   id: string
   title: string
   cards: Card[]
   wipLimit?: number
 }
-// Доска с колонками
+// доска
 export interface Board {
   id: string
   title: string
@@ -26,37 +26,37 @@ export interface Board {
   background?: string
   favorite?: boolean
 }
-//История действий
+// история
 export interface HistoryEntry {
   id: string
   action: string
   timestamp: number
 }
-//Подтаски
+// подзадача
 export interface SubTask {
   id: string
   text: string
   done: boolean
 }
-//Метки
+// тег
 export interface Tag {
   id: string
   name: string
   color: string
 }
-//Комментарий
+// комментарий
 export interface Comment {
   id: string
   text: string
   createdAt: number
 }
-//Тоаст
+// уведомление
 export interface Toast {
   id: string
   message: string
   type: 'success' | 'error' | 'info'
 }
-// Шаблоны карточек
+// шаблон карточки
 export interface CardTemplate {
   id: string
   name: string

@@ -3,14 +3,14 @@ import type { Board } from '@/types'
 import { useThemeStore } from '@/stores/theme'
 
 const backgrounds = [
-  // Тёмные
+  // тёмные
   'linear-gradient(135deg, #1a1a2e, #16213e, #0f3460)',
   'linear-gradient(135deg, #0f0c29, #302b63, #24243e)',
   'linear-gradient(135deg, #2d1b69, #6b21a8, #9333ea)',
   'linear-gradient(135deg, #064e3b, #065f46, #047857)',
   'linear-gradient(135deg, #7f1d1d, #991b1b, #b91c1c)',
   'linear-gradient(135deg, #1a1033, #2d1b69, #4a2c8a)',
-  // Светлые
+  // светлые
   'linear-gradient(135deg, #e0c3fc, #8ec5fc, #f5f7fa)',
   'linear-gradient(135deg, #fbc2eb, #a6c1ee, #c2e9fb)',
   'linear-gradient(135deg, #a8edea, #fed6e3, #fefbd8)',
@@ -19,7 +19,7 @@ const backgrounds = [
   'linear-gradient(135deg, #a1c4fd, #c2e9fb, #e8f0fe)',
   'linear-gradient(135deg, #f3e7e9, #e3eeff, #d4e4ff)',
   'linear-gradient(135deg, #fad0c4, #ffd1ff, #e8cff7)',
-  // Однотонные
+  // однотонные
   '#1a1a2e',
   '#0f172a',
   '#1e293b',

@@ -124,23 +124,35 @@ function deleteBoard(id: string) {
 <style scoped>
 .home {
   min-height: 100vh;
-  background: linear-gradient(
-    135deg,
-    var(--bg-gradient-1),
-    var(--bg-gradient-2),
-    var(--bg-gradient-3)
-  );
+  background: var(--bg-main);
+  position: relative;
+  overflow: hidden;
 }
 
-/* ===== Header ===== */
+.home::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 30%, var(--aurora-1) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 80% 70%, var(--aurora-2) 0%, transparent 45%),
+    radial-gradient(ellipse 60% 50% at 50% 10%, var(--aurora-3) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* шапка */
 .home-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 32px;
-  background: rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 0 28px;
+  height: 56px;
+  background: var(--header-bg);
+  backdrop-filter: blur(40px);
+  border-bottom: 1px solid var(--border-subtle);
+  position: relative;
+  z-index: 2;
 }
 
 .header-left {
@@ -150,106 +162,127 @@ function deleteBoard(id: string) {
 }
 
 .logo {
-  font-size: 22px;
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
   font-weight: 800;
-  color: var(--text-primary);
-  letter-spacing: -0.04em;
+  background: linear-gradient(135deg, #a78bfa, #60a5fa, #f472b6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .logo-accent {
-  color: var(--accent);
-  font-size: 24px;
+  font-size: 18px;
 }
 
 .logo-dot {
-  width: 5px;
-  height: 5px;
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
-  background: var(--accent);
+  background: #8b5cf6;
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.5);
   flex-shrink: 0;
 }
 
 .logo-sub {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--text-secondary);
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .theme-toggle {
-  width: 38px;
-  height: 38px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  font-size: 18px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-medium);
+  border-radius: 8px;
+  font-size: 14px;
   cursor: pointer;
   transition: all 0.2s;
+  color: var(--text-secondary);
 }
 
 .theme-toggle:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--bg-hover);
   transform: rotate(20deg);
 }
 
-/* ===== Content ===== */
+/* контент */
 .home-content {
   max-width: 900px;
   margin: 0 auto;
-  padding: 48px 32px;
+  padding: 56px 32px;
+  position: relative;
+  z-index: 1;
 }
 
 .welcome-section {
-  margin-bottom: 32px;
+  margin-bottom: 40px;
 }
 
 .welcome-section h1 {
-  margin: 0 0 4px;
-  font-size: 28px;
+  margin: 0 0 6px;
+  font-size: 32px;
   font-weight: 800;
   color: var(--text-primary);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
 }
 
 .welcome-sub {
   margin: 0;
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-secondary);
 }
 
-/* ===== Board Grid ===== */
+/* сетка досок */
 .boards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 16px;
+  gap: 12px;
 }
 
 .board-card {
   position: relative;
-  background: var(--bg-column);
-  border-radius: 14px;
-  padding: 20px;
-  min-height: 130px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: 24px;
+  min-height: 140px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   text-decoration: none;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s,
-    border-color 0.2s;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.board-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.06) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
 }
 
 .board-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
-  border-color: rgba(139, 92, 246, 0.3);
+  background: var(--bg-card-hover);
+  border-color: rgba(139, 92, 246, 0.2);
+  transform: translateY(-4px) rotateX(1deg);
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.4),
+    0 0 60px rgba(139, 92, 246, 0.06);
+}
+
+.board-card:hover::after {
+  opacity: 1;
 }
 
 .board-card-bar {
@@ -257,10 +290,10 @@ function deleteBoard(id: string) {
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--accent), #a78bfa);
+  height: 3px;
+  background: linear-gradient(90deg, #a78bfa, #60a5fa, #f472b6);
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity 0.3s;
 }
 
 .board-card:hover .board-card-bar {
@@ -274,7 +307,7 @@ function deleteBoard(id: string) {
 
 .board-name {
   margin: 0 0 10px;
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--text-primary);
   white-space: nowrap;
@@ -295,13 +328,13 @@ function deleteBoard(id: string) {
 }
 
 .stat-value {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
-  color: var(--accent);
+  color: #a78bfa;
 }
 
 .stat-label {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-secondary);
 }
 
@@ -309,14 +342,13 @@ function deleteBoard(id: string) {
   width: 3px;
   height: 3px;
   border-radius: 50%;
-  background: var(--text-secondary);
-  opacity: 0.5;
+  background: var(--text-muted);
 }
 
 .board-delete {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 12px;
+  right: 12px;
   width: 28px;
   height: 28px;
   display: flex;
@@ -324,9 +356,9 @@ function deleteBoard(id: string) {
   justify-content: center;
   background: none;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   color: var(--text-muted);
-  font-size: 14px;
+  font-size: 12px;
   cursor: pointer;
   opacity: 0;
   transition: all 0.2s;
@@ -338,61 +370,66 @@ function deleteBoard(id: string) {
 }
 
 .board-delete:hover {
-  background: rgba(239, 68, 68, 0.15);
-  color: var(--danger);
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
 }
 
-/* ===== Create Card ===== */
+/* создание доски */
 .create-card {
   justify-content: center;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   background: transparent;
-  border: 2px dashed rgba(139, 92, 246, 0.25);
+  border: 1px dashed rgba(139, 92, 246, 0.15);
   cursor: default;
 }
 
+.create-card::after {
+  display: none;
+}
+
 .create-card:hover {
-  border-color: rgba(139, 92, 246, 0.5);
-  background: rgba(139, 92, 246, 0.04);
+  border-color: rgba(139, 92, 246, 0.35);
+  background: rgba(139, 92, 246, 0.03);
   transform: none;
   box-shadow: none;
 }
 
 .create-icon {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: rgba(139, 92, 246, 0.12);
-  color: var(--accent);
+  background: rgba(139, 92, 246, 0.08);
+  color: #a78bfa;
   font-size: 22px;
   font-weight: 300;
 }
 
 .create-input {
   width: 100%;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
+  padding: 8px 14px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-medium);
+  border-radius: 10px;
   color: var(--text-primary);
-  font-size: 14px;
+  font-size: 13px;
+  font-family: 'Outfit', sans-serif;
   text-align: center;
   outline: none;
   transition: all 0.2s;
 }
 
 .create-input::placeholder {
-  color: var(--text-secondary);
+  color: var(--text-placeholder);
 }
 
 .create-input:focus {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
+  background: var(--bg-input-focus);
+  border-color: rgba(139, 92, 246, 0.3);
+  box-shadow: 0 0 0 3px var(--accent-glow);
 }
 
 .create-btn {
@@ -400,22 +437,23 @@ function deleteBoard(id: string) {
   background: var(--accent);
   color: #fff;
   border: none;
-  border-radius: 8px;
-  font-size: 13px;
+  border-radius: 10px;
+  font-size: 12px;
   font-weight: 600;
+  font-family: 'Outfit', sans-serif;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .create-btn:hover {
   background: #7c3aed;
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
 }
 
 .board-favorite {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 12px;
+  left: 12px;
   width: 28px;
   height: 28px;
   display: flex;
@@ -423,9 +461,9 @@ function deleteBoard(id: string) {
   justify-content: center;
   background: none;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   color: var(--text-muted);
-  font-size: 16px;
+  font-size: 14px;
   cursor: pointer;
   opacity: 0;
   transition: all 0.2s;
@@ -443,21 +481,22 @@ function deleteBoard(id: string) {
 
 .board-favorite:hover {
   color: #f59e0b;
-  background: rgba(245, 158, 11, 0.15);
+  background: rgba(245, 158, 11, 0.1);
 }
 
-/* ===== Mobile ===== */
+/* мобильная версия */
 @media (max-width: 768px) {
   .home-header {
-    padding: 12px 16px;
+    padding: 0 16px;
+    height: 52px;
   }
 
   .home-content {
-    padding: 24px 16px;
+    padding: 28px 16px;
   }
 
   .welcome-section h1 {
-    font-size: 22px;
+    font-size: 24px;
   }
 
   .boards-grid {

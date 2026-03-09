@@ -222,7 +222,7 @@ function saveAsTemplate() {
       <div class="modal-content">
         <button class="btn-icon modal-close" @click="emit('close')">✕</button>
 
-        <!-- Просмотр -->
+        <!-- просмотр -->
         <div v-if="!isEditing" class="modal-view">
           <div class="modal-header">
             <h2>{{ card.title }}</h2>
@@ -312,7 +312,7 @@ function saveAsTemplate() {
           </div>
         </div>
 
-        <!-- Редактирование -->
+        <!-- редактирование -->
         <div v-else class="modal-edit">
           <div class="edit-field">
             <label>Название</label>
@@ -370,8 +370,8 @@ function saveAsTemplate() {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
+  background: var(--modal-overlay);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -379,106 +379,130 @@ function saveAsTemplate() {
 }
 
 .modal-content {
-  background: var(--bg-column);
-  border-radius: 12px;
-  padding: 24px;
+  background: var(--modal-bg);
+  border: 1px solid var(--border-medium);
+  border-radius: 16px;
+  padding: 28px;
   width: 90%;
-  max-width: 500px;
+  max-width: 520px;
   max-height: 80vh;
   overflow-y: auto;
   position: relative;
-  color: var(--text-primary);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  color: var(--modal-text);
+  box-shadow:
+    0 24px 64px var(--shadow),
+    0 0 80px var(--accent-glow);
 }
 
 .modal-close {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 16px;
+  right: 16px;
+  color: var(--modal-text-dim);
+  font-size: 16px;
+}
+
+.modal-close:hover {
+  color: var(--modal-text-muted);
 }
 
 .modal-header {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .modal-header h2 {
   margin: 0;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--modal-heading);
 }
 
 .priority-badge {
   padding: 4px 10px;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
+  border-radius: 6px;
 }
 
 .priority-badge.low {
-  background: var(--priority-low);
-  color: #fff;
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
 }
 
 .priority-badge.medium {
-  background: var(--priority-medium);
-  color: #fff;
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
 }
 
 .priority-badge.high {
-  background: var(--priority-high);
-  color: #fff;
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
 }
 
 .modal-description {
-  margin: 0 0 16px;
-  line-height: 1.5;
+  margin: 0 0 20px;
+  line-height: 1.6;
+  font-size: 13px;
+  color: var(--modal-text-sub);
 }
 
 .modal-description.empty {
-  color: var(--text-secondary);
+  color: var(--modal-text-dim);
   font-style: italic;
 }
 
 .modal-deadline {
-  margin-bottom: 16px;
-  font-size: 0.9rem;
-  color: var(--text-secondary);
+  margin-bottom: 20px;
+  font-size: 12px;
+  color: var(--modal-text-muted);
 }
 
 .modal-deadline.overdue {
-  color: var(--priority-high);
+  color: #ef4444;
   font-weight: 600;
 }
 
 .modal-subtasks {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .modal-subtasks h3 {
-  margin: 0 0 8px;
-  font-size: 1rem;
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--modal-text-muted);
 }
 
 .subtask-item {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 4px 0;
+  padding: 5px 0;
   cursor: pointer;
+  font-size: 13px;
+  color: var(--modal-text-body);
 }
 
 .subtask-item .done {
   text-decoration: line-through;
-  color: var(--text-secondary);
+  color: var(--modal-text-dim);
 }
 
 .modal-move {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .modal-move h3 {
-  margin: 0 0 8px;
-  font-size: 1rem;
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--modal-text-muted);
 }
 
 .move-buttons {
@@ -488,9 +512,11 @@ function saveAsTemplate() {
 }
 
 .modal-meta {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  margin-bottom: 16px;
+  font-size: 10px;
+  color: var(--modal-text-dim);
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .modal-actions {
@@ -501,23 +527,25 @@ function saveAsTemplate() {
 
 .modal-actions .btn {
   padding: 8px 4px;
-  font-size: 12px;
+  font-size: 11px;
   text-align: center;
   justify-content: center;
   white-space: nowrap;
 }
 
-/* Edit mode */
+/* режим редактирования */
 .edit-field {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .edit-field label {
   display: block;
-  margin-bottom: 4px;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  font-weight: 600;
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--modal-text-muted);
 }
 
 .edit-field input,
@@ -529,14 +557,23 @@ function saveAsTemplate() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 4px 0;
+  padding: 5px 0;
+  font-size: 13px;
+  color: var(--modal-text-body);
 }
 
 .edit-subtask button {
   background: none;
   border: none;
-  color: var(--priority-high);
+  color: #ef4444;
   cursor: pointer;
+  font-size: 12px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.edit-subtask button:hover {
+  opacity: 1;
 }
 
 .add-subtask {
@@ -553,14 +590,18 @@ function saveAsTemplate() {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .tag-badge {
   border: 1.5px solid transparent;
   background: transparent;
   opacity: 0.4;
-  transition: opacity 0.2s;
+  transition: all 0.2s;
+}
+
+.tag-badge:hover {
+  opacity: 0.7;
 }
 
 .tag-badge.active {
@@ -570,18 +611,23 @@ function saveAsTemplate() {
 }
 
 .modal-comments {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .modal-comments h3 {
-  margin: 0 0 8px;
-  font-size: 1rem;
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--modal-text-muted);
 }
 
 .comment-item {
-  padding: 8px;
-  background: var(--bg-input);
-  border-radius: 8px;
+  padding: 10px 12px;
+  background: var(--modal-card-bg);
+  border: 1px solid var(--modal-card-border);
+  border-radius: 10px;
   margin-bottom: 8px;
 }
 
@@ -593,22 +639,24 @@ function saveAsTemplate() {
 }
 
 .comment-time {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
+  font-size: 10px;
+  color: var(--modal-text-dim);
 }
 
 .comment-delete {
-  font-size: 14px;
+  font-size: 12px;
+  color: var(--modal-text-dim);
 }
 
 .comment-delete:hover {
-  color: var(--priority-high);
+  color: #ef4444;
 }
 
 .comment-text {
   margin: 0;
-  font-size: 0.85rem;
-  line-height: 1.4;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--modal-text-body);
 }
 
 .comment-add textarea {
@@ -616,13 +664,14 @@ function saveAsTemplate() {
 }
 
 .comment-add button {
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 .modal-description :deep(h1),
 .modal-description :deep(h2),
 .modal-description :deep(h3) {
   margin: 8px 0 4px;
+  color: var(--modal-heading);
 }
 
 .modal-description :deep(p) {
@@ -636,16 +685,16 @@ function saveAsTemplate() {
 }
 
 .modal-description :deep(code) {
-  background: var(--bg-input);
+  background: var(--modal-card-bg);
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 0.85em;
 }
 
 .modal-description :deep(pre) {
-  background: var(--bg-input);
+  background: var(--modal-card-bg);
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 10px;
   overflow-x: auto;
   margin: 0 0 8px;
 }
@@ -656,17 +705,17 @@ function saveAsTemplate() {
 }
 
 .modal-description :deep(a) {
-  color: var(--accent);
+  color: #a78bfa;
 }
 
 .modal-description :deep(blockquote) {
-  border-left: 3px solid var(--accent);
+  border-left: 2px solid var(--accent);
   margin: 0 0 8px;
   padding-left: 12px;
-  color: var(--text-secondary);
+  color: var(--modal-text-muted);
 }
 
-/* ===== Mobile ===== */
+/* мобильная версия */
 @media (max-width: 768px) {
   .modal-overlay {
     align-items: flex-end;
@@ -686,7 +735,7 @@ function saveAsTemplate() {
     display: block;
     width: 36px;
     height: 4px;
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--modal-grab);
     border-radius: 2px;
     margin: 0 auto 12px;
   }
@@ -709,7 +758,7 @@ function saveAsTemplate() {
   }
 
   .modal-header h2 {
-    font-size: 1.15rem;
+    font-size: 1.1rem;
     width: 100%;
   }
 
@@ -730,7 +779,7 @@ function saveAsTemplate() {
 
   .modal-actions .btn {
     padding: 12px 8px;
-    font-size: 13px;
+    font-size: 12px;
     text-align: center;
     justify-content: center;
     white-space: nowrap;
@@ -767,7 +816,7 @@ function saveAsTemplate() {
 }
 
 .modal-content::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 
 .modal-content::-webkit-scrollbar-track {
@@ -775,11 +824,11 @@ function saveAsTemplate() {
 }
 
 .modal-content::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 3px;
+  background: var(--modal-scrollbar);
+  border-radius: 2px;
 }
 
 .modal-content::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--modal-text-dim);
 }
 </style>

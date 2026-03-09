@@ -19,7 +19,7 @@ const { toasts } = useToast()
 <style scoped>
 .toast-container {
   position: fixed;
-  bottom: 20px;
+  bottom: 24px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 9999;
@@ -30,44 +30,48 @@ const { toasts } = useToast()
 }
 
 .toast {
-  padding: 12px 16px 12px 20px;
-  border-radius: 8px;
-  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 12px;
   font-weight: 500;
-  background: var(--bg-column);
-  color: var(--text-primary);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 4px 16px var(--shadow);
-  border: 1px solid var(--bg-hover);
+  font-family: 'Outfit', sans-serif;
+  background: rgba(13, 13, 22, 0.9);
+  color: #ccc;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .toast-success {
-  border-color: var(--priority-low);
+  border-color: rgba(34, 197, 94, 0.3);
+  color: #22c55e;
 }
 
 .toast-error {
-  border-color: var(--priority-high);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
 }
 
 .toast-info {
-  border-color: var(--accent);
+  border-color: rgba(139, 92, 246, 0.3);
+  color: #a78bfa;
 }
 
 .toast-enter-active {
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .toast-leave-active {
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .toast-enter-from {
   opacity: 0;
-  transform: translateY(30px);
+  transform: translateY(20px) scale(0.95);
 }
 
 .toast-leave-to {
   opacity: 0;
-  transform: translateY(30px);
+  transform: translateY(20px) scale(0.95);
 }
 </style>

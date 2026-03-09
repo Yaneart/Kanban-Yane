@@ -14,72 +14,131 @@ provideToast()
 
 <style>
 :root {
-  --bg-gradient-1: #1a1033;
-  --bg-gradient-2: #2d1b69;
-  --bg-gradient-3: #4a2c8a;
+  --bg-main: #06060c;
+  --bg-gradient-1: #06060c;
+  --bg-gradient-2: #0a0a14;
+  --bg-gradient-3: #0e0e1a;
 
-  --bg-column: #2a2040;
-  --bg-card: #362b50;
-  --bg-card-hover: #3d3260;
+  --bg-column: rgba(255, 255, 255, 0.012);
+  --bg-column-solid: #0d0d16;
+  --bg-card: rgba(255, 255, 255, 0.025);
+  --bg-card-hover: rgba(255, 255, 255, 0.04);
 
-  --bg-hover: rgba(255, 255, 255, 0.08);
-  --bg-input: rgba(255, 255, 255, 0.1);
-  --bg-input-alt: rgba(255, 255, 255, 0.12);
-  --bg-input-focus: rgba(255, 255, 255, 0.15);
-  --bg-input-focus-strong: rgba(255, 255, 255, 0.2);
+  --bg-hover: rgba(255, 255, 255, 0.04);
+  --bg-input: rgba(255, 255, 255, 0.04);
+  --bg-input-alt: rgba(255, 255, 255, 0.06);
+  --bg-input-focus: rgba(255, 255, 255, 0.08);
+  --bg-input-focus-strong: rgba(255, 255, 255, 0.12);
   --bg-input-solid: rgba(255, 255, 255, 0.9);
 
-  --text-primary: #e8e0f0;
-  --text-secondary: #9b8ab8;
-  --text-muted: #ccc;
-  --text-placeholder: rgba(255, 255, 255, 0.4);
+  --border-subtle: rgba(255, 255, 255, 0.04);
+  --border-medium: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.08);
 
-  --accent: #a882ff;
-  --accent-btn: #7c5cbf;
-  --accent-btn-hover: #9a6ef5;
-  --accent-soft: rgba(168, 130, 255, 0.4);
-  --accent-medium: rgba(168, 130, 255, 0.6);
+  --text-primary: #e0e0e0;
+  --text-secondary: #555;
+  --text-muted: #333;
+  --text-placeholder: rgba(255, 255, 255, 0.25);
 
-  --priority-low: #61bd4f;
-  --priority-medium: #f2d600;
-  --priority-high: #eb5a46;
+  --accent: #8b5cf6;
+  --accent-btn: #8b5cf6;
+  --accent-btn-hover: #7c3aed;
+  --accent-soft: rgba(139, 92, 246, 0.2);
+  --accent-medium: rgba(139, 92, 246, 0.35);
+  --accent-glow: rgba(139, 92, 246, 0.06);
 
-  --danger: #eb5a46;
-  --danger-bg: rgba(235, 90, 70, 0.1);
+  --color-blue: #3b82f6;
+  --color-pink: #ec4899;
+  --color-green: #10b981;
+  --color-purple: #8b5cf6;
 
-  --shadow: rgba(0, 0, 0, 0.3);
-  --shadow-hover: rgba(0, 0, 0, 0.4);
+  --priority-low: #22c55e;
+  --priority-medium: #f59e0b;
+  --priority-high: #ef4444;
+
+  --danger: #ef4444;
+  --danger-bg: rgba(239, 68, 68, 0.1);
+
+  --shadow: rgba(0, 0, 0, 0.4);
+  --shadow-hover: rgba(0, 0, 0, 0.6);
+
+  --aurora-1: rgba(124, 58, 237, 0.12);
+  --aurora-2: rgba(59, 130, 246, 0.08);
+  --aurora-3: rgba(236, 72, 153, 0.06);
+  --header-bg: rgba(6, 6, 12, 0.7);
+  --card-title: #ddd;
+  --card-desc: #4a4a5a;
+
+  --modal-bg: #0d0d16;
+  --modal-overlay: rgba(6, 6, 12, 0.7);
+  --modal-text: #e0e0e0;
+  --modal-text-sub: #999;
+  --modal-text-muted: #555;
+  --modal-text-dim: #333;
+  --modal-text-body: #bbb;
+  --modal-heading: #eee;
+  --modal-card-bg: rgba(255, 255, 255, 0.025);
+  --modal-card-border: rgba(255, 255, 255, 0.04);
+  --modal-scrollbar: rgba(255, 255, 255, 0.08);
+  --modal-grab: rgba(255, 255, 255, 0.1);
 }
 
 [data-theme='light'] {
-  --bg-gradient-1: #e8e0f0;
-  --bg-gradient-2: #d4c5e8;
-  --bg-gradient-3: #c0a8e0;
+  --bg-main: #e8eaef;
+  --bg-gradient-1: #dfe2e8;
+  --bg-gradient-2: #d5d9e0;
+  --bg-gradient-3: #ccd0d9;
 
-  --bg-column: #f5f0fa;
-  --bg-card: #ffffff;
-  --bg-card-hover: #f0eaf5;
+  --bg-column: rgba(255, 255, 255, 0.4);
+  --bg-column-solid: #e2e5ec;
+  --bg-card: rgba(255, 255, 255, 0.55);
+  --bg-card-hover: rgba(255, 255, 255, 0.75);
 
-  --bg-hover: rgba(0, 0, 0, 0.06);
+  --bg-hover: rgba(0, 0, 0, 0.05);
   --bg-input: rgba(0, 0, 0, 0.06);
   --bg-input-alt: rgba(0, 0, 0, 0.08);
-  --bg-input-focus: rgba(0, 0, 0, 0.1);
+  --bg-input-focus: rgba(0, 0, 0, 0.08);
   --bg-input-focus-strong: rgba(0, 0, 0, 0.12);
-  --bg-input-solid: #ffffff;
+  --bg-input-solid: #f0f1f5;
 
-  --text-primary: #2d1b4e;
-  --text-secondary: #6b5a85;
-  --text-muted: #555;
-  --text-placeholder: rgba(0, 0, 0, 0.4);
+  --border-subtle: rgba(100, 116, 139, 0.12);
+  --border-medium: rgba(100, 116, 139, 0.18);
+  --border-strong: rgba(100, 116, 139, 0.25);
 
-  --accent: #7c5cbf;
-  --accent-btn: #7c5cbf;
-  --accent-btn-hover: #6a4aad;
-  --accent-soft: rgba(124, 92, 191, 0.2);
-  --accent-medium: rgba(124, 92, 191, 0.35);
+  --text-primary: #1a1a2e;
+  --text-secondary: #4a5568;
+  --text-muted: #818a9a;
+  --text-placeholder: rgba(0, 0, 0, 0.32);
 
-  --shadow: rgba(0, 0, 0, 0.1);
-  --shadow-hover: rgba(0, 0, 0, 0.15);
+  --accent: #7c3aed;
+  --accent-btn: #7c3aed;
+  --accent-btn-hover: #6d28d9;
+  --accent-soft: rgba(124, 58, 237, 0.1);
+  --accent-medium: rgba(124, 58, 237, 0.18);
+  --accent-glow: rgba(124, 58, 237, 0.06);
+
+  --shadow: rgba(0, 0, 0, 0.08);
+  --shadow-hover: rgba(0, 0, 0, 0.14);
+
+  --aurora-1: rgba(100, 116, 139, 0.06);
+  --aurora-2: rgba(59, 130, 246, 0.05);
+  --aurora-3: rgba(124, 58, 237, 0.04);
+  --header-bg: rgba(232, 234, 239, 0.88);
+  --card-title: #1e293b;
+  --card-desc: #5a6577;
+
+  --modal-bg: #ffffff;
+  --modal-overlay: rgba(0, 0, 0, 0.3);
+  --modal-text: #1a1a2e;
+  --modal-text-sub: #555;
+  --modal-text-muted: #888;
+  --modal-text-dim: #aaa;
+  --modal-text-body: #444;
+  --modal-heading: #1a1a2e;
+  --modal-card-bg: rgba(0, 0, 0, 0.03);
+  --modal-card-border: rgba(0, 0, 0, 0.06);
+  --modal-scrollbar: rgba(0, 0, 0, 0.1);
+  --modal-grab: rgba(0, 0, 0, 0.1);
 }
 
 * {
@@ -88,11 +147,7 @@ provideToast()
 
 body {
   margin: 0;
-  font-family:
-    'Inter',
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    sans-serif;
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg-main);
 }
 </style>

@@ -43,6 +43,10 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside))
 function addColumn() {
   const title = newColumnTitle.value.trim()
   if (!title) return
+  if (props.board.columns.length >= 10) {
+    addToast('Максимум 10 колонок', 'error')
+    return
+  }
   const column: Column = {
     id: crypto.randomUUID(),
     title,
@@ -139,9 +143,11 @@ function updateColumn(updatedColumn: Column) {
 
 <template>
   <div class="kanban-board" :style="boardStyle">
-    <!-- Header -->
+    <!-- шапка -->
     <header class="board-header">
-      <RouterLink to="/" class="back-btn" title="На главную">←</RouterLink>
+      <RouterLink to="/" class="logo-link" title="На главную">
+        <span class="logo-text">KANBAN</span>
+      </RouterLink>
       <div class="header-divider"></div>
       <h1 class="board-title">{{ board.title }}</h1>
 
@@ -160,7 +166,7 @@ function updateColumn(updatedColumn: Column) {
             title="Фон доски"
             @click="showBgPicker = !showBgPicker"
           >
-            🎨 <span class="action-label">Фон</span>
+            Фон
           </button>
           <button
             class="action-btn"
@@ -168,7 +174,7 @@ function updateColumn(updatedColumn: Column) {
             title="История действий"
             @click="showHistory = !showHistory"
           >
-            📋 <span class="action-label">История</span>
+            История
           </button>
           <button
             class="action-btn"
@@ -176,12 +182,12 @@ function updateColumn(updatedColumn: Column) {
             title="Архив карточек"
             @click="showArchive = !showArchive"
           >
-            📦 <span class="action-label">Архив</span>
+            Архив
           </button>
         </div>
 
         <button class="action-btn theme-btn" title="Сменить тему" @click="themeStore.toggleTheme()">
-          {{ themeStore.theme === 'dark' ? '☀️' : '🌙' }}
+          {{ themeStore.theme === 'dark' ? '☀' : '☾' }}
         </button>
 
         <div class="dropdown-wrapper">
@@ -227,7 +233,7 @@ function updateColumn(updatedColumn: Column) {
       <button class="btn btn-ghost btn-sm" @click="resetBackground">Сброс</button>
     </div>
 
-    <!-- Main content -->
+    <!-- основной контент -->
     <div class="board-body">
       <div class="board-content">
         <draggable
@@ -260,7 +266,7 @@ function updateColumn(updatedColumn: Column) {
         </div>
       </div>
 
-      <!-- Sidebar -->
+      <!-- боковая панель -->
       <Transition name="slide">
         <aside v-if="showHistory" class="history-panel">
           <div class="history-header">
@@ -300,57 +306,69 @@ function updateColumn(updatedColumn: Column) {
 </template>
 
 <style scoped>
-/* ===== Layout ===== */
+/* разметка */
 .kanban-board {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  background: var(--bg-main);
+  position: relative;
+  overflow: hidden;
 }
 
-/* ===== Header ===== */
+.kanban-board::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 15% 35%, var(--aurora-1) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 85% 15%, var(--aurora-2) 0%, transparent 45%),
+    radial-gradient(ellipse 60% 50% at 50% 85%, var(--aurora-3) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* шапка */
 .board-header {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 16px;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  gap: 16px;
+  padding: 0 28px;
+  height: 56px;
+  background: var(--header-bg);
+  backdrop-filter: blur(40px);
+  border-bottom: 1px solid var(--border-subtle);
+  position: relative;
+  z-index: 2;
 }
 
-.back-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  color: var(--text-secondary);
+.logo-link {
   text-decoration: none;
-  font-size: 16px;
-  transition:
-    background 0.2s,
-    color 0.2s;
   flex-shrink: 0;
 }
 
-.back-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text-primary);
+.logo-text {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #a78bfa, #60a5fa, #f472b6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .header-divider {
   width: 1px;
   height: 22px;
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--border-strong);
   flex-shrink: 0;
 }
 
 .board-title {
   margin: 0;
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 600;
+  color: #888;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -370,39 +388,39 @@ function updateColumn(updatedColumn: Column) {
 
 .search-icon {
   position: absolute;
-  left: 10px;
+  left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 12px;
+  font-size: 11px;
   pointer-events: none;
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
 .search-input {
   width: 100%;
-  padding: 7px 12px 7px 30px;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  border-radius: 8px;
-  color: var(--text-primary);
-  font-size: 13px;
+  padding: 7px 16px 7px 32px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-medium);
+  border-radius: 10px;
+  color: #888;
+  font-size: 12px;
+  font-family: 'Outfit', sans-serif;
   outline: none;
   transition: all 0.25s;
 }
 
 .search-input::placeholder {
   color: var(--text-secondary);
-  font-size: 13px;
 }
 
 .search-input:focus {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
-  max-width: 300px;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(139, 92, 246, 0.3);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+  color: var(--text-primary);
 }
 
-/* ===== Header Actions ===== */
+/* кнопки шапки */
 .header-actions {
   display: flex;
   align-items: center;
@@ -412,10 +430,9 @@ function updateColumn(updatedColumn: Column) {
 
 .btn-group {
   display: flex;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
   padding: 3px;
+  border-radius: 10px;
   gap: 2px;
 }
 
@@ -425,62 +442,61 @@ function updateColumn(updatedColumn: Column) {
   justify-content: center;
   gap: 5px;
   height: 32px;
-  padding: 0 10px;
-  background: none;
+  padding: 0 12px;
+  background: transparent;
   border: none;
-  border-radius: 7px;
+  border-radius: 8px;
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'Outfit', sans-serif;
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.2s;
 }
 
 .action-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.06);
+  color: #999;
 }
 
 .action-btn.active {
-  background: var(--accent);
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.35);
+  background: rgba(139, 92, 246, 0.2);
+  color: #a78bfa;
 }
 
 .action-label {
   font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
+  font-weight: 500;
 }
 
 .theme-btn {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   padding: 0;
   border-radius: 8px;
-  font-size: 16px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-medium);
 }
 
 .theme-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08);
   transform: rotate(20deg);
 }
 
-/* ===== Dropdown ===== */
+/* выпадающее меню */
 .dropdown-wrapper {
   position: relative;
 }
 
 .dropdown-wrapper > .action-btn {
-  width: 34px;
+  width: 32px;
   padding: 0;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
-  letter-spacing: 1px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-medium);
   border-radius: 8px;
 }
 
@@ -488,12 +504,12 @@ function updateColumn(updatedColumn: Column) {
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  background: var(--bg-column);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-column-solid);
+  border: 1px solid var(--border-medium);
   border-radius: 12px;
   padding: 6px;
   min-width: 200px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
   z-index: 100;
 }
 
@@ -507,14 +523,15 @@ function updateColumn(updatedColumn: Column) {
   border: none;
   border-radius: 8px;
   color: var(--text-primary);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
+  font-family: 'Outfit', sans-serif;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: all 0.15s;
 }
 
 .dropdown-item:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .dropdown-item.danger {
@@ -522,12 +539,12 @@ function updateColumn(updatedColumn: Column) {
 }
 
 .dropdown-item.danger:hover {
-  background: rgba(239, 68, 68, 0.12);
+  background: rgba(239, 68, 68, 0.08);
 }
 
 .dropdown-separator {
   height: 1px;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--border-subtle);
   margin: 4px 8px;
 }
 
@@ -544,85 +561,111 @@ function updateColumn(updatedColumn: Column) {
   transform: translateY(-6px);
 }
 
-/* ===== Body ===== */
+/* тело доски */
 .board-body {
   display: flex;
   flex: 1;
   overflow: hidden;
+  position: relative;
+  z-index: 1;
 }
 
 .board-content {
   display: flex;
-  gap: 16px;
+  gap: 2px;
   flex: 1;
   overflow-x: auto;
-  padding: 20px;
-  align-items: flex-start;
+  padding: 0;
+  align-items: stretch;
 }
 
 .column-list {
   display: flex;
-  gap: 16px;
-  align-items: flex-start;
+  gap: 2px;
+  align-items: stretch;
+  flex: 1;
 }
 
 .add-column {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  min-width: 280px;
-  background: var(--bg-hover);
-  border-radius: 12px;
-  padding: 12px;
+  min-width: 200px;
+  max-width: 200px;
+  background: transparent;
+  padding: 20px 12px;
   flex-shrink: 0;
+  opacity: 0.5;
+  transition: opacity 0.3s;
+}
+
+.add-column:hover {
+  opacity: 1;
 }
 
 .add-column input {
-  padding: 10px 12px;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  background: var(--bg-input-solid);
+  padding: 8px 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  font-size: 12px;
+  font-family: 'Outfit', sans-serif;
+  background: transparent;
+  color: var(--text-primary);
   outline: none;
+  transition: all 0.2s;
+}
+
+.add-column input::placeholder {
+  color: #2a2a35;
+}
+
+.add-column input:focus {
+  border-color: rgba(139, 92, 246, 0.2);
+  background: rgba(139, 92, 246, 0.03);
 }
 
 .add-column button {
-  padding: 10px;
-  background: var(--accent-soft);
-  color: var(--text-primary);
+  padding: 8px;
+  background: rgba(139, 92, 246, 0.08);
+  color: #666;
   border: none;
-  border-radius: 6px;
+  border-radius: 10px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 11px;
   font-weight: 600;
-  transition: background 0.2s;
+  font-family: 'Outfit', sans-serif;
+  transition: all 0.2s;
 }
 
 .add-column button:hover {
-  background: var(--accent-medium);
+  background: rgba(139, 92, 246, 0.15);
+  color: #a78bfa;
 }
 
-/* ===== History Sidebar ===== */
+/* панель истории */
 .history-panel {
   width: 280px;
   min-width: 280px;
-  background: var(--bg-column);
-  padding: 16px;
+  background: var(--bg-column-solid);
+  padding: 20px 16px;
   overflow-y: auto;
-  border-left: 1px solid var(--bg-hover);
+  border-left: 1px solid var(--border-subtle);
 }
 
 .history-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .history-header h3 {
   margin: 0;
-  font-size: 14px;
-  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
 }
 
 .history-panel ul {
@@ -632,19 +675,19 @@ function updateColumn(updatedColumn: Column) {
 }
 
 .history-panel li {
-  padding: 8px 0;
-  border-bottom: 1px solid var(--bg-hover);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .history-action {
-  color: var(--text-primary);
+  color: #ccc;
   display: block;
   font-size: 12px;
 }
 
 .history-time {
-  color: var(--text-secondary);
-  font-size: 11px;
+  color: var(--text-muted);
+  font-size: 10px;
 }
 
 .slide-enter-active,
@@ -661,8 +704,8 @@ function updateColumn(updatedColumn: Column) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--bg-hover);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .archive-card-info {
@@ -673,42 +716,43 @@ function updateColumn(updatedColumn: Column) {
 
 .archive-card-title {
   font-size: 13px;
-  color: var(--text-primary);
+  color: #ccc;
 }
 
 .archive-card-column {
-  font-size: 11px;
-  color: var(--text-secondary);
+  font-size: 10px;
+  color: var(--text-muted);
 }
 
 .restore-btn {
-  color: var(--accent);
+  color: #a78bfa;
 }
 
 .bg-picker {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 20px;
-  background: rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(10px);
+  padding: 8px 28px;
+  background: rgba(6, 6, 12, 0.5);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-subtle);
   flex-wrap: wrap;
+  position: relative;
+  z-index: 2;
 }
 
 .bg-option {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
   cursor: pointer;
   border: 2px solid transparent;
-  transition:
-    border-color 0.2s,
-    transform 0.2s;
+  transition: all 0.2s;
 }
 
 .bg-option:hover {
   border-color: var(--accent);
-  transform: scale(1.1);
+  transform: scale(1.15);
 }
 
 .bg-url-input {
@@ -716,7 +760,7 @@ function updateColumn(updatedColumn: Column) {
 }
 
 .board-content::-webkit-scrollbar {
-  height: 8px;
+  height: 4px;
 }
 
 .board-content::-webkit-scrollbar-track {
@@ -724,12 +768,12 @@ function updateColumn(updatedColumn: Column) {
 }
 
 .board-content::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
 }
 
 .board-content::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .column-list :deep(.column-ghost) {
@@ -738,20 +782,21 @@ function updateColumn(updatedColumn: Column) {
 
 .column-list :deep(.column-dragging) {
   opacity: 0.9;
-  transform: rotate(2deg);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+  transform: rotate(1deg);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
 }
 
-/* ===== Mobile ===== */
+/* мобильная версия */
 @media (max-width: 768px) {
   .board-header {
     flex-wrap: wrap;
     gap: 6px;
-    padding: 8px 10px;
+    padding: 8px 12px;
+    height: auto;
   }
 
   .board-title {
-    font-size: 14px;
+    font-size: 13px;
     white-space: normal;
     flex: 0 1 auto;
     max-width: 120px;
@@ -768,7 +813,7 @@ function updateColumn(updatedColumn: Column) {
   }
 
   .search-input {
-    padding: 10px 12px 10px 30px;
+    padding: 10px 12px 10px 32px;
     font-size: 16px;
   }
 
@@ -791,28 +836,26 @@ function updateColumn(updatedColumn: Column) {
 
   .action-btn {
     padding: 0 8px;
-    font-size: 15px;
+    font-size: 14px;
   }
 
-  .action-label {
-    display: none;
-  }
+  /* скрытие текста кнопок на мобилке */
 
   .board-content {
-    padding: 12px 8px;
-    gap: 10px;
+    padding: 0;
+    gap: 0;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
   }
 
   .column-list {
-    gap: 10px;
+    gap: 0;
   }
 
   .board-content :deep(.kanban-column) {
     scroll-snap-align: start;
-    min-width: 82vw;
-    width: 82vw;
+    min-width: 85vw;
+    width: 85vw;
   }
 
   .board-content :deep(.column-drag-handle) {
@@ -822,7 +865,7 @@ function updateColumn(updatedColumn: Column) {
   }
 
   .add-column {
-    min-width: 82vw;
+    min-width: 85vw;
   }
 
   .history-panel {
@@ -833,13 +876,11 @@ function updateColumn(updatedColumn: Column) {
     width: 85vw;
     min-width: auto;
     z-index: 200;
-    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.4);
+    box-shadow: -4px 0 30px rgba(0, 0, 0, 0.5);
   }
 
-  .back-btn {
-    width: 44px;
-    height: 44px;
-    font-size: 18px;
+  .logo-text {
+    font-size: 15px;
   }
 
   .action-btn {
