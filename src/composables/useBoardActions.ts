@@ -38,6 +38,9 @@ export function useBoardActions(
           addToast('Ошибка импорта', 'error')
         }
       }
+      reader.onerror = () => {
+        addToast('Ошибка чтения файла', 'error')
+      }
       reader.readAsText(file)
     }
     input.click()

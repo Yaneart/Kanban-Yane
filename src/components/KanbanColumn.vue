@@ -17,6 +17,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   delete: [id: string]
   move: [cardId: string, sourceColumnId: string, targetColumnId: string]
+  'update-column': [column: Column]
 }>()
 
 const newCardTitle = ref('')
@@ -74,8 +75,11 @@ function startEditing() {
 function saveEdit() {
   const title = editTitle.value.trim()
   if (!title) return
-  props.column.title = title
-  props.column.wipLimit = (editWipLimit.value ?? 0) > 0 ? editWipLimit.value : undefined
+  emit('update-column', {
+    ...props.column,
+    title,
+    wipLimit: (editWipLimit.value ?? 0) > 0 ? editWipLimit.value : undefined,
+  })
   addHistory(`Колонка переименована в "${title}"`)
   isEditing.value = false
 }
@@ -101,14 +105,14 @@ function addCard() {
     subtask: template ? JSON.parse(JSON.stringify(template.subtasks)) : undefined,
   }
 
-  props.column.cards.push(card)
+  emit('update-column', { ...props.column, cards: [...props.column.cards, card] })
   addHistory(`Добавлена карточка "${title}" в "${props.column.title}"`)
   addToast('Карточка добавлена', 'success')
   newCardTitle.value = ''
   selectedTemplate.value = ''
 }
 
-function onDragChange(event: any) {
+function onDragChange(event: { added?: { element: Card } }) {
   if (event.added) {
     addHistory(`Карточка "${event.added.element.title}" перемещена в "${props.column.title}"`)
     addToast('Карточка перемещена', 'success')
@@ -118,7 +122,10 @@ function onDragChange(event: any) {
 function updateCard(updatedCard: Card) {
   const index = props.column.cards.findIndex((c) => c.id === updatedCard.id)
   if (index !== -1) {
-    props.column.cards[index] = updatedCard
+    emit('update-column', {
+      ...props.column,
+      cards: props.column.cards.map((c) => (c.id === updatedCard.id ? updatedCard : c)),
+    })
   }
   selectedCard.value = updatedCard
 }
@@ -128,12 +135,12 @@ function deleteCardFromModal(id: string) {
   if (card) {
     addHistory(`Удалена карточка "${card.title}" из "${props.column.title}"`)
     addToast('Карточка удалена', 'success')
-    props.column.cards = props.column.cards.filter((c) => c.id !== id)
+    emit('update-column', { ...props.column, cards: props.column.cards.filter((c) => c.id !== id) })
   }
   selectedCard.value = null
 }
 
-function onDragMove(event: any) {
+function onDragMove(event: { to: HTMLElement; from: HTMLElement }) {
   if (event.to === event.from) return true
 
   const targetLimit = Number(event.to.dataset.wipLimit) || 0
@@ -151,7 +158,7 @@ function moveCard(cardId: string, targetColumnId: string) {
 }
 
 function duplicateCard(card: Card) {
-  props.column.cards.push(card)
+  emit('update-column', { ...props.column, cards: [...props.column.cards, card] })
 }
 </script>
 
@@ -224,7 +231,7 @@ function duplicateCard(card: Card) {
       :data-wip-limit="column.wipLimit || 0"
       :data-active-count="activeCards.length"
       @change="onDragChange"
-      @update:model-value="(val: any) => (props.column.cards = val)"
+      @update:model-value="(val: Card[]) => emit('update-column', { ...props.column, cards: val })"
     >
       <template #item="{ element }">
         <KanbanCard v-if="!element.archived" :card="element" @click="selectedCard = element" />

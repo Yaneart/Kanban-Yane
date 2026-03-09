@@ -22,5 +22,11 @@ export default defineConfigWithVueTs(
 
   ...pluginOxlint.buildFromOxlintConfigFile('.oxlintrc.json'),
 
+  {
+    rules: {
+      'vue/no-mutating-props': 'off',
+    },
+  },
+
   skipFormatting,
 )

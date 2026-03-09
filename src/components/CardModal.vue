@@ -196,7 +196,7 @@ function duplicateCard() {
 }
 
 function saveAsTemplate() {
-  const name = prompt('Название шаблона')
+  const name = prompt('Название шаблона')?.trim()
 
   if (!name) return
 
