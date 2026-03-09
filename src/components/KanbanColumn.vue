@@ -30,7 +30,8 @@ const selectedCard = ref<Card | null>(null)
 const { addToast } = useToast()
 const editInputRef = ref<HTMLInputElement | null>(null)
 
-const { templates } = useTemplateStore()
+const templateStore = useTemplateStore()
+const { templates } = templateStore
 const selectedTemplate = ref('')
 
 const filteredCards = computed(() => {
@@ -242,11 +243,21 @@ function duplicateCard(card: Card) {
         </div>
       </template>
     </draggable>
-    <div class="add-card">
-      <select v-if="templates.length" v-model="selectedTemplate" class="sort-select">
+    <div v-if="templates.length" class="template-select">
+      <select v-model="selectedTemplate" class="sort-select">
         <option value="">Без шаблона</option>
         <option v-for="t in templates" :key="t.id" :value="t.id">{{ t.name }}</option>
       </select>
+      <button
+        v-if="selectedTemplate"
+        class="btn-icon template-delete"
+        title="Удалить шаблон"
+        @click="templateStore.deleteTemplate(selectedTemplate); selectedTemplate = ''"
+      >
+        ✕
+      </button>
+    </div>
+    <div class="add-card">
       <input v-model="newCardTitle" placeholder="Новая задача..." @keyup.enter="addCard" />
       <button @click="addCard">+</button>
     </div>
@@ -340,6 +351,23 @@ function duplicateCard(card: Card) {
   min-height: 20px;
 }
 
+.cards-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.cards-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.cards-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.cards-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
 .edit-input {
   width: 100%;
   padding: 6px 8px;
@@ -358,6 +386,28 @@ function duplicateCard(card: Card) {
   align-self: center;
   gap: 6px;
   margin-bottom: 8px;
+}
+
+.template-select {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.template-select .sort-select {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.template-delete {
+  color: var(--text-secondary);
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.template-delete:hover {
+  color: var(--danger);
 }
 
 .add-card {
@@ -498,9 +548,17 @@ function duplicateCard(card: Card) {
   }
 
   .delete-column-btn {
-    width: 32px;
-    height: 32px;
-    font-size: 16px;
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+  }
+
+  .add-card input {
+    min-height: 44px;
+  }
+
+  .add-card button {
+    min-height: 44px;
   }
 }
 </style>

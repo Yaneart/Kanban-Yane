@@ -277,6 +277,9 @@ function deleteBoard(id: string) {
   font-size: 17px;
   font-weight: 700;
   color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .board-stats {

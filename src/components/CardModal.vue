@@ -494,8 +494,17 @@ function saveAsTemplate() {
 }
 
 .modal-actions {
-  display: flex;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+
+.modal-actions .btn {
+  padding: 8px 4px;
+  font-size: 12px;
+  text-align: center;
+  justify-content: center;
+  white-space: nowrap;
 }
 
 /* Edit mode */
@@ -668,8 +677,8 @@ function saveAsTemplate() {
     max-width: 100%;
     max-height: 92vh;
     border-radius: 16px 16px 0 0;
-    padding: 20px 16px;
-    padding-top: 12px;
+    padding: 16px 16px 20px;
+    animation: slideUp 0.3s ease-out;
   }
 
   .modal-content::before {
@@ -685,12 +694,12 @@ function saveAsTemplate() {
   .modal-close {
     top: 16px;
     right: 16px;
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 20px;
   }
 
   .modal-header {
@@ -725,6 +734,7 @@ function saveAsTemplate() {
     text-align: center;
     justify-content: center;
     white-space: nowrap;
+    min-height: 44px;
   }
 
   .subtask-item {
@@ -743,7 +753,33 @@ function saveAsTemplate() {
   .edit-field input,
   .edit-field textarea {
     font-size: 16px;
-    padding: 10px 12px;
+    padding: 12px 14px;
   }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 </style>

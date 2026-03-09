@@ -715,6 +715,23 @@ function updateColumn(updatedColumn: Column) {
   max-width: 200px;
 }
 
+.board-content::-webkit-scrollbar {
+  height: 8px;
+}
+
+.board-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.board-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+.board-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
 .column-list :deep(.column-ghost) {
   opacity: 0.3;
 }
@@ -731,11 +748,6 @@ function updateColumn(updatedColumn: Column) {
     flex-wrap: wrap;
     gap: 6px;
     padding: 8px 10px;
-  }
-
-  .back-btn {
-    width: 32px;
-    height: 32px;
   }
 
   .board-title {
@@ -760,6 +772,10 @@ function updateColumn(updatedColumn: Column) {
     font-size: 16px;
   }
 
+  .search-input:focus {
+    max-width: none;
+  }
+
   .header-divider {
     display: none;
   }
@@ -774,19 +790,12 @@ function updateColumn(updatedColumn: Column) {
   }
 
   .action-btn {
-    height: 34px;
     padding: 0 8px;
     font-size: 15px;
   }
 
   .action-label {
     display: none;
-  }
-
-  .theme-btn,
-  .dropdown-wrapper > .action-btn {
-    width: 34px;
-    height: 34px;
   }
 
   .board-content {
@@ -823,8 +832,24 @@ function updateColumn(updatedColumn: Column) {
     height: 100vh;
     width: 85vw;
     min-width: auto;
-    z-index: 100;
+    z-index: 200;
     box-shadow: -4px 0 20px rgba(0, 0, 0, 0.4);
+  }
+
+  .back-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+  }
+
+  .action-btn {
+    height: 44px;
+  }
+
+  .theme-btn,
+  .dropdown-wrapper > .action-btn {
+    width: 44px;
+    height: 44px;
   }
 }
 </style>

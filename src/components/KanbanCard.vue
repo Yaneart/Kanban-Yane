@@ -228,6 +228,8 @@ const parsedDescription = computed(() => {
   max-height: 60px;
   overflow: hidden;
   line-height: 1.4;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .card-description :deep(p) {

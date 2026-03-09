@@ -10,7 +10,10 @@ export const useTemplateStore = defineStore('templates', () => {
   }
 
   function deleteTemplate(id: string) {
-    templates.value = templates.value.filter((e) => e.id !== id)
+    const index = templates.value.findIndex((e) => e.id === id)
+    if (index !== -1) {
+      templates.value.splice(index, 1)
+    }
   }
 
   return { templates, addTemplate, deleteTemplate }
