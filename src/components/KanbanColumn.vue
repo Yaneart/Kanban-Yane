@@ -6,6 +6,7 @@ import draggable from 'vuedraggable'
 import { useHistory } from '@/composables/useHistory'
 import CardModal from './CardModal.vue'
 import { useToast } from '@/composables/useToast'
+import { useTemplateStore } from '@/stores/templates'
 
 const props = defineProps<{
   column: Column
@@ -27,6 +28,9 @@ const sortMode = ref<'none' | 'priority' | 'date' | 'name'>('none')
 const selectedCard = ref<Card | null>(null)
 const { addToast } = useToast()
 const editInputRef = ref<HTMLInputElement | null>(null)
+
+const { templates } = useTemplateStore()
+const selectedTemplate = ref('')
 
 const filteredCards = computed(() => {
   const query = props.searchQuery.toLowerCase().trim()
@@ -85,18 +89,23 @@ function addCard() {
   const title = newCardTitle.value.trim()
   if (!title) return
 
+  const template = templates.find((t) => t.id === selectedTemplate.value)
+
   const card: Card = {
     id: crypto.randomUUID(),
     title,
-    description: '',
+    description: template?.description ?? '',
     createdAt: Date.now(),
-    priority: 'low',
+    priority: template?.priority ?? 'low',
+    tags: template ? [...template.tags] : undefined,
+    subtask: template ? JSON.parse(JSON.stringify(template.subtasks)) : undefined,
   }
 
   props.column.cards.push(card)
   addHistory(`Добавлена карточка "${title}" в "${props.column.title}"`)
   addToast('Карточка добавлена', 'success')
   newCardTitle.value = ''
+  selectedTemplate.value = ''
 }
 
 function onDragChange(event: any) {
@@ -227,6 +236,10 @@ function duplicateCard(card: Card) {
       </template>
     </draggable>
     <div class="add-card">
+      <select v-if="templates.length" v-model="selectedTemplate" class="sort-select">
+        <option value="">Без шаблона</option>
+        <option v-for="t in templates" :key="t.id" :value="t.id">{{ t.name }}</option>
+      </select>
       <input v-model="newCardTitle" placeholder="Новая задача..." @keyup.enter="addCard" />
       <button @click="addCard">+</button>
     </div>

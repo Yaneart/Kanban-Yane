@@ -6,6 +6,7 @@ import { availableTags } from '@/data/tags'
 import { useToast } from '@/composables/useToast'
 import { formatDate } from '@/utils/format'
 import { marked } from 'marked'
+import { useTemplateStore } from '@/stores/templates'
 
 const props = defineProps<{
   card: Card
@@ -37,6 +38,7 @@ const editSubTask = ref<SubTask[]>([])
 const newSubTask = ref('')
 const newComment = ref('')
 const { addToast } = useToast()
+const { addTemplate } = useTemplateStore()
 
 onMounted(() => {
   overlayRef.value?.focus()
@@ -192,6 +194,20 @@ function duplicateCard() {
   addToast('Карточка скопирована', 'success')
   emit('close')
 }
+
+function saveAsTemplate() {
+  const name = prompt('Название шаблона')
+
+  if (!name) return
+
+  addTemplate({
+    name,
+    priority: props.card.priority,
+    tags: props.card.tags ?? [],
+    subtasks: props.card.subtask ?? [],
+    description: props.card.description,
+  })
+}
 </script>
 
 <template>
@@ -291,6 +307,7 @@ function duplicateCard() {
             <button class="btn btn-accent" @click="startEditing">Редактировать</button>
             <button class="btn btn-primary" @click="duplicateCard">Копировать</button>
             <button class="btn btn-primary" @click="archivedCard">Архив</button>
+            <button class="btn btn-primary" @click="saveAsTemplate">Шаблон</button>
             <button class="btn btn-danger" @click="emit('delete', card.id)">Удалить</button>
           </div>
         </div>

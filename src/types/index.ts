@@ -56,3 +56,12 @@ export interface Toast {
   message: string
   type: 'success' | 'error' | 'info'
 }
+// Шаблоны карточек
+export interface CardTemplate {
+  id: string
+  name: string
+  priority: 'high' | 'medium' | 'low'
+  tags: Tag[]
+  subtasks: SubTask[]
+  description: string
+}
