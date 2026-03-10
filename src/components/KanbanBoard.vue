@@ -9,6 +9,7 @@ import { useToast } from '@/composables/useToast'
 import { formatTime } from '@/utils/format'
 import { useBackground } from '@/composables/useBackground'
 import { useBoardActions } from '@/composables/useBoardActions'
+import BoardStats from './BoardStats.vue'
 
 const props = defineProps<{
   board: Board
@@ -29,6 +30,7 @@ const showBgPicker = ref(false)
 const showMenu = ref(false)
 const { backgrounds, boardStyle, setBackground, resetBackground } = useBackground(props.board)
 const { exportBoard, importBoard } = useBoardActions(props.board, emit, addHistory)
+const showStats = ref(false)
 
 function onClickOutside(event: MouseEvent) {
   const target = event.target as HTMLElement
@@ -139,6 +141,22 @@ function updateColumn(updatedColumn: Column) {
     props.board.columns[index] = updatedColumn
   }
 }
+
+function togglePanel(panel: 'history' | 'archive' | 'stats') {
+  if (panel === 'history') {
+    showHistory.value = !showHistory.value
+    showArchive.value = false
+    showStats.value = false
+  } else if (panel === 'archive') {
+    showArchive.value = !showArchive.value
+    showHistory.value = false
+    showStats.value = false
+  } else {
+    showStats.value = !showStats.value
+    showHistory.value = false
+    showArchive.value = false
+  }
+}
 </script>
 
 <template>
@@ -172,7 +190,7 @@ function updateColumn(updatedColumn: Column) {
             class="action-btn"
             :class="{ active: showHistory }"
             title="История действий"
-            @click="showHistory = !showHistory"
+            @click="togglePanel('history')"
           >
             История
           </button>
@@ -180,9 +198,17 @@ function updateColumn(updatedColumn: Column) {
             class="action-btn"
             :class="{ active: showArchive }"
             title="Архив карточек"
-            @click="showArchive = !showArchive"
+            @click="togglePanel('archive')"
           >
             Архив
+          </button>
+          <button
+            class="action-btn"
+            :class="{ active: showStats }"
+            title="Статистика"
+            @click="togglePanel('stats')"
+          >
+            Статистика
           </button>
         </div>
 
@@ -299,6 +325,15 @@ function updateColumn(updatedColumn: Column) {
               ↩
             </button>
           </div>
+        </aside>
+      </Transition>
+      <Transition name="slide">
+        <aside v-if="showStats" class="history-panel">
+          <div class="history-header">
+            <h3>Статистика</h3>
+            <button class="btn-icon" @click="showStats = false">✕</button>
+          </div>
+          <BoardStats :board="board" />
         </aside>
       </Transition>
     </div>
