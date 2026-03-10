@@ -243,21 +243,23 @@ function togglePanel(panel: 'history' | 'archive' | 'stats') {
       </div>
     </header>
 
-    <div v-if="showBgPicker" class="bg-picker">
-      <div
-        v-for="bg in backgrounds"
-        :key="bg"
-        class="bg-option"
-        :style="{ background: bg }"
-        @click="setBackground(bg)"
-      ></div>
-      <input
-        class="input bg-url-input"
-        placeholder="URL картинки..."
-        @keyup.enter="setBackground(($event.target as HTMLInputElement).value)"
-      />
-      <button class="btn btn-ghost btn-sm" @click="resetBackground">Сброс</button>
-    </div>
+    <Transition name="bg-slide">
+      <div v-if="showBgPicker" class="bg-picker">
+        <div
+          v-for="bg in backgrounds"
+          :key="bg"
+          class="bg-option"
+          :style="{ background: bg }"
+          @click="setBackground(bg)"
+        ></div>
+        <input
+          class="input bg-url-input"
+          placeholder="URL картинки..."
+          @keyup.enter="setBackground(($event.target as HTMLInputElement).value)"
+        />
+        <button class="btn btn-ghost btn-sm" @click="resetBackground">Сброс</button>
+      </div>
+    </Transition>
 
     <!-- основной контент -->
     <div class="board-body">
@@ -679,12 +681,17 @@ function togglePanel(panel: 'history' | 'archive' | 'stats') {
 
 /* панель истории */
 .history-panel {
+  position: fixed;
+  top: 56px;
+  right: 0;
+  bottom: 0;
   width: 280px;
-  min-width: 280px;
   background: var(--bg-column-solid);
   padding: 20px 16px;
   overflow-y: auto;
   border-left: 1px solid var(--border-subtle);
+  scrollbar-width: none;
+  z-index: 10;
 }
 
 .history-header {
@@ -725,14 +732,35 @@ function togglePanel(panel: 'history' | 'archive' | 'stats') {
   font-size: 10px;
 }
 
-.slide-enter-active,
+.slide-enter-active {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 .slide-leave-active {
-  transition: transform 0.3s ease;
+  transition: transform 0.2s ease-in;
 }
 
 .slide-enter-from,
 .slide-leave-to {
   transform: translateX(100%);
+}
+
+.bg-slide-enter-active {
+  transition:
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.3s;
+}
+
+.bg-slide-leave-active {
+  transition:
+    transform 0.2s ease-in,
+    opacity 0.2s;
+}
+
+.bg-slide-enter-from,
+.bg-slide-leave-to {
+  transform: translateY(-100%);
+  opacity: 0;
 }
 
 .archive-item {
@@ -764,16 +792,19 @@ function togglePanel(panel: 'history' | 'archive' | 'stats') {
 }
 
 .bg-picker {
+  position: fixed;
+  top: 56px;
+  left: 0;
+  right: 0;
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 8px 28px;
-  background: rgba(6, 6, 12, 0.5);
+  background: var(--bg-column-solid);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-subtle);
   flex-wrap: wrap;
-  position: relative;
-  z-index: 2;
+  z-index: 10;
 }
 
 .bg-option {
