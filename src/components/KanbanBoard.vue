@@ -33,6 +33,7 @@ const { backgrounds, boardStyle, setBackground, resetBackground } = useBackgroun
 const { exportBoard, importBoard } = useBoardActions(props.board, emit, addHistory)
 const showStats = ref(false)
 const activeTags = ref<string[]>([])
+const showTagFilter = ref(false)
 
 function onClickOutside(event: MouseEvent) {
   const target = event.target as HTMLElement
@@ -186,17 +187,6 @@ function toggleTag(tagId: string) {
           <span class="search-icon">🔍</span>
           <input v-model="searchQuery" class="search-input" placeholder="Поиск..." />
         </div>
-        <div class="tag-filters">
-          <button
-            v-for="tag in availableTags"
-            :key="tag.id"
-            :class="['tag-filter', { active: activeTags.includes(tag.id) }]"
-            :style="{ '--tag-color': tag.color } as any"
-            @click="toggleTag(tag.id)"
-          >
-            {{ tag.name }}
-          </button>
-        </div>
       </div>
 
       <div class="header-actions">
@@ -208,6 +198,15 @@ function toggleTag(tagId: string) {
             @click="showBgPicker = !showBgPicker"
           >
             Фон
+          </button>
+          <button
+            class="action-btn"
+            :class="{ active: showTagFilter }"
+            title="Фильтр по тегам"
+            @click="showTagFilter = !showTagFilter"
+          >
+            Теги
+            <span v-if="activeTags.length" class="tag-badge">{{ activeTags.length }}</span>
           </button>
           <button
             class="action-btn"
@@ -281,6 +280,23 @@ function toggleTag(tagId: string) {
           @keyup.enter="setBackground(($event.target as HTMLInputElement).value)"
         />
         <button class="btn btn-ghost btn-sm" @click="resetBackground">Сброс</button>
+      </div>
+    </Transition>
+
+    <Transition name="bg-slide">
+      <div v-if="showTagFilter" class="tag-panel">
+        <button
+          v-for="tag in availableTags"
+          :key="tag.id"
+          :class="['tag-filter', { active: activeTags.includes(tag.id) }]"
+          :style="{ '--tag-color': tag.color } as any"
+          @click="toggleTag(tag.id)"
+        >
+          {{ tag.name }}
+        </button>
+        <button v-if="activeTags.length" class="btn btn-ghost btn-sm" @click="activeTags = []">
+          Сброс
+        </button>
       </div>
     </Transition>
 
@@ -876,10 +892,20 @@ function toggleTag(tagId: string) {
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
 }
 
-.tag-filters {
+.tag-panel {
+  position: fixed;
+  top: 56px;
+  left: 0;
+  right: 0;
   display: flex;
-  gap: 4px;
-  margin-left: 12px;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 28px;
+  background: var(--bg-column-solid);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+  z-index: 10;
 }
 
 .tag-filter {
@@ -904,6 +930,15 @@ function toggleTag(tagId: string) {
   background: color-mix(in srgb, var(--tag-color) 15%, transparent);
   color: var(--tag-color);
   border-color: color-mix(in srgb, var(--tag-color) 30%, transparent);
+}
+
+.tag-badge {
+  background: rgba(139, 92, 246, 0.3);
+  color: #a78bfa;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 6px;
+  margin-left: 2px;
 }
 
 /* мобильная версия */
