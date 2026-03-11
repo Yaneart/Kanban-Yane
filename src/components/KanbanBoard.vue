@@ -195,7 +195,12 @@ function toggleTag(tagId: string) {
             class="action-btn"
             :class="{ active: showBgPicker }"
             title="Фон доски"
-            @click="showBgPicker = !showBgPicker"
+            @click="
+              () => {
+                showBgPicker = !showBgPicker
+                showTagFilter = false
+              }
+            "
           >
             Фон
           </button>
@@ -203,7 +208,12 @@ function toggleTag(tagId: string) {
             class="action-btn"
             :class="{ active: showTagFilter }"
             title="Фильтр по тегам"
-            @click="showTagFilter = !showTagFilter"
+            @click="
+              () => {
+                showTagFilter = !showTagFilter
+                showBgPicker = false
+              }
+            "
           >
             Теги
             <span v-if="activeTags.length" class="tag-badge">{{ activeTags.length }}</span>
