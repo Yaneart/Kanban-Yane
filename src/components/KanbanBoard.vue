@@ -10,6 +10,7 @@ import { formatTime } from '@/utils/format'
 import { useBackground } from '@/composables/useBackground'
 import { useBoardActions } from '@/composables/useBoardActions'
 import BoardStats from './BoardStats.vue'
+import { availableTags } from '@/data/tags'
 
 const props = defineProps<{
   board: Board
@@ -31,6 +32,7 @@ const showMenu = ref(false)
 const { backgrounds, boardStyle, setBackground, resetBackground } = useBackground(props.board)
 const { exportBoard, importBoard } = useBoardActions(props.board, emit, addHistory)
 const showStats = ref(false)
+const activeTags = ref<string[]>([])
 
 function onClickOutside(event: MouseEvent) {
   const target = event.target as HTMLElement
@@ -157,6 +159,16 @@ function togglePanel(panel: 'history' | 'archive' | 'stats') {
     showArchive.value = false
   }
 }
+
+function toggleTag(tagId: string) {
+  const index = activeTags.value.indexOf(tagId)
+
+  if (index === -1) {
+    activeTags.value.push(tagId)
+  } else {
+    activeTags.value.splice(index, 1)
+  }
+}
 </script>
 
 <template>
@@ -173,6 +185,17 @@ function togglePanel(panel: 'history' | 'archive' | 'stats') {
         <div class="search-wrapper">
           <span class="search-icon">🔍</span>
           <input v-model="searchQuery" class="search-input" placeholder="Поиск..." />
+        </div>
+        <div class="tag-filters">
+          <button
+            v-for="tag in availableTags"
+            :key="tag.id"
+            :class="['tag-filter', { active: activeTags.includes(tag.id) }]"
+            :style="{ '--tag-color': tag.color } as any"
+            @click="toggleTag(tag.id)"
+          >
+            {{ tag.name }}
+          </button>
         </div>
       </div>
 
@@ -282,6 +305,7 @@ function togglePanel(panel: 'history' | 'archive' | 'stats') {
               :search-query="searchQuery"
               :column="element"
               :all-columns="columnsList"
+              :active-tags="activeTags"
               @delete="deleteColumn"
               @move="moveCard"
               @update-column="updateColumn"
@@ -850,6 +874,36 @@ function togglePanel(panel: 'history' | 'archive' | 'stats') {
   opacity: 0.9;
   transform: rotate(1deg);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+}
+
+.tag-filters {
+  display: flex;
+  gap: 4px;
+  margin-left: 12px;
+}
+
+.tag-filter {
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tag-filter:hover {
+  background: color-mix(in srgb, var(--tag-color) 12%, transparent);
+  color: var(--tag-color);
+}
+
+.tag-filter.active {
+  background: color-mix(in srgb, var(--tag-color) 15%, transparent);
+  color: var(--tag-color);
+  border-color: color-mix(in srgb, var(--tag-color) 30%, transparent);
 }
 
 /* мобильная версия */

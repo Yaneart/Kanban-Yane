@@ -11,6 +11,7 @@ import { useTemplateStore } from '@/stores/templates'
 const props = defineProps<{
   column: Column
   searchQuery: string
+  activeTags: string[]
   allColumns: { id: string; title: string }[]
 }>()
 
@@ -40,6 +41,10 @@ const filteredCards = computed(() => {
 
   if (query) {
     cards = cards.filter((card) => card.title.toLowerCase().includes(query))
+  }
+
+  if (props.activeTags.length > 0) {
+    cards = cards.filter((card) => card.tags?.some((tag) => props.activeTags.includes(tag.id)))
   }
 
   if (sortMode.value === 'name') {
