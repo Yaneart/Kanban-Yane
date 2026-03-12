@@ -7,6 +7,7 @@ import { useToast } from '@/composables/useToast'
 import { formatDate } from '@/utils/format'
 import { marked } from 'marked'
 import { useTemplateStore } from '@/stores/templates'
+import { useKeyboardShortcuts } from '@/composables/useKeyboardShortcuts'
 
 const props = defineProps<{
   card: Card
@@ -42,6 +43,12 @@ const { addTemplate } = useTemplateStore()
 
 onMounted(() => {
   overlayRef.value?.focus()
+})
+
+useKeyboardShortcuts({
+  onDelete() {
+    emit('delete', props.card.id)
+  },
 })
 
 const parsedDescription = computed(() => {

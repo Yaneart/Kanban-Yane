@@ -265,7 +265,12 @@ function duplicateCard(card: Card) {
       </button>
     </div>
     <div class="add-card">
-      <input v-model="newCardTitle" placeholder="Новая задача..." @keyup.enter="addCard" />
+      <input
+        class="add-card-input"
+        v-model="newCardTitle"
+        placeholder="Новая задача..."
+        @keyup.enter="addCard"
+      />
       <button @click="addCard">+</button>
     </div>
     <CardModal

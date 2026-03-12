@@ -11,6 +11,7 @@ import { useBackground } from '@/composables/useBackground'
 import { useBoardActions } from '@/composables/useBoardActions'
 import BoardStats from './BoardStats.vue'
 import { availableTags } from '@/data/tags'
+import { useKeyboardShortcuts } from '@/composables/useKeyboardShortcuts'
 
 const props = defineProps<{
   board: Board
@@ -44,6 +45,16 @@ function onClickOutside(event: MouseEvent) {
 
 onMounted(() => document.addEventListener('click', onClickOutside))
 onUnmounted(() => document.removeEventListener('click', onClickOutside))
+
+useKeyboardShortcuts({
+  onNewCard() {
+    const input = document.querySelector('.add-card-input') as HTMLInputElement
+    input?.focus()
+  },
+  onUndo() {
+    addToast('Undo пока не реализован', 'info')
+  },
+})
 
 function addColumn() {
   const title = newColumnTitle.value.trim()
