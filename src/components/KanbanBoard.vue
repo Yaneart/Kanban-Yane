@@ -24,7 +24,8 @@ const emit = defineEmits<{
 const newColumnTitle = ref('')
 const searchQuery = ref('')
 const showHistory = ref(false)
-const { history, addHistory } = provideHistory()
+const columnsRef = computed(() => props.board.columns)
+const { history, addHistory, undo } = provideHistory(columnsRef)
 const themeStore = useThemeStore()
 const showArchive = ref(false)
 const { addToast } = useToast()
@@ -52,7 +53,13 @@ useKeyboardShortcuts({
     input?.focus()
   },
   onUndo() {
-    addToast('Undo пока не реализован', 'info')
+    const snapshot = undo()
+    if (snapshot) {
+      props.board.columns = snapshot
+      addToast('Отменено', 'info')
+    } else {
+      addToast('Нечего отменять', 'info')
+    }
   },
 })
 
@@ -68,8 +75,8 @@ function addColumn() {
     title,
     cards: [],
   }
-  props.board.columns.push(column)
   addHistory(`Добавлена колонка "${title}"`)
+  props.board.columns.push(column)
   addToast('Колонка добавлена', 'success')
   newColumnTitle.value = ''
 }
@@ -144,8 +151,8 @@ function restoreCard(columnId: string, cardId: string) {
   const card = column.cards.find((c) => c.id === cardId)
   if (!card) return
 
-  card.archived = false
   addHistory(`Восстановлена карточка "${card.title}"`)
+  card.archived = false
   addToast('Карточка восстановлена', 'success')
 }
 

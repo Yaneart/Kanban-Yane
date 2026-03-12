@@ -25,7 +25,7 @@ const newCardTitle = ref('')
 const isEditing = ref(false)
 const editTitle = ref('')
 const editWipLimit = ref<number | undefined>(0)
-const { addHistory } = useHistory()
+const { addHistory, saveSnapshot } = useHistory()
 const sortMode = ref<'none' | 'priority' | 'date' | 'name'>('none')
 const selectedCard = ref<Card | null>(null)
 const { addToast } = useToast()
@@ -81,12 +81,12 @@ function startEditing() {
 function saveEdit() {
   const title = editTitle.value.trim()
   if (!title) return
+  addHistory(`Колонка переименована в "${title}"`)
   emit('update-column', {
     ...props.column,
     title,
     wipLimit: (editWipLimit.value ?? 0) > 0 ? editWipLimit.value : undefined,
   })
-  addHistory(`Колонка переименована в "${title}"`)
   isEditing.value = false
 }
 
@@ -111,8 +111,8 @@ function addCard() {
     subtask: template ? JSON.parse(JSON.stringify(template.subtasks)) : undefined,
   }
 
-  emit('update-column', { ...props.column, cards: [...props.column.cards, card] })
   addHistory(`Добавлена карточка "${title}" в "${props.column.title}"`)
+  emit('update-column', { ...props.column, cards: [...props.column.cards, card] })
   addToast('Карточка добавлена', 'success')
   newCardTitle.value = ''
   selectedTemplate.value = ''
@@ -235,6 +235,7 @@ function duplicateCard(card: Card) {
       :data-active-count="activeCards.length"
       @change="onDragChange"
       @update:model-value="(val: Card[]) => emit('update-column', { ...props.column, cards: val })"
+      @start="saveSnapshot"
     >
       <template #item="{ element }">
         <KanbanCard v-if="!element.archived" :card="element" @click="selectedCard = element" />

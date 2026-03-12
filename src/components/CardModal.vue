@@ -78,8 +78,8 @@ function saveEdit() {
     subtask: JSON.parse(JSON.stringify(editSubTask.value)),
   }
 
-  emit('update', updateCard)
   addHistory(`Редактирование карточки:"${title}"`)
+  emit('update', updateCard)
   isEditing.value = false
 }
 
@@ -92,8 +92,8 @@ function togglePriority() {
   const currentIndex = priorities.indexOf(props.card.priority)
   const nextPriority = priorities[(currentIndex + 1) % priorities.length]
 
-  emit('update', { ...props.card, priority: nextPriority ?? 'low' })
   addHistory(`Смена приоритета на ${nextPriority}`)
+  emit('update', { ...props.card, priority: nextPriority ?? 'low' })
   addToast('Приоритет сменен', 'info')
 }
 
@@ -138,8 +138,8 @@ function toggleTag(tag: Tag) {
   const exists = currentTag.find((s) => s.id === tag.id)
 
   const newTag = exists ? currentTag.filter((s) => s.id !== tag.id) : [...currentTag, tag]
-  emit('update', { ...props.card, tags: newTag })
   addHistory(`${exists ? 'Убрана' : 'Добавлена'} метка "${tag.name}"`)
+  emit('update', { ...props.card, tags: newTag })
 }
 
 function hasTag(tagId: string) {
@@ -157,8 +157,8 @@ function addComment() {
   }
 
   const updateComments = [...(props.card.comments || []), comment]
-  emit('update', { ...props.card, comments: updateComments })
   addHistory(`Комментарий к "${props.card.title}"`)
+  emit('update', { ...props.card, comments: updateComments })
   addToast('Комментарий добавлен', 'info')
   newComment.value = ''
 }
@@ -171,8 +171,8 @@ function deleteComment(id: string) {
 }
 
 function archivedCard() {
-  emit('update', { ...props.card, archived: true })
   addHistory(`Архивирована карточка "${props.card.title}"`)
+  emit('update', { ...props.card, archived: true })
   addToast('Карточка архивирована', 'info')
   emit('close')
 }
@@ -182,9 +182,9 @@ const moveTargetColumns = computed(() =>
 )
 
 function moveCard(targetColumnId: string) {
-  emit('move', props.card.id, targetColumnId)
   const targetCol = props.columns.find((c) => c.id === targetColumnId)
   addHistory(`Карточка "${props.card.title}" перемещена в "${targetCol?.title}"`)
+  emit('move', props.card.id, targetColumnId)
   addToast('Карточка перемещена', 'success')
   emit('close')
 }
@@ -196,8 +196,8 @@ function duplicateCard() {
     title: props.card.title + ' (копия)',
     createdAt: Date.now(),
   }
-  emit('duplicate', copy)
   addHistory(`Скопирована карточка "${props.card.title}"`)
+  emit('duplicate', copy)
   addToast('Карточка скопирована', 'success')
   emit('close')
 }
