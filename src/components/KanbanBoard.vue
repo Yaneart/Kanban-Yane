@@ -13,6 +13,8 @@ import BoardStats from './BoardStats.vue'
 import { availableTags } from '@/data/tags'
 import { useKeyboardShortcuts } from '@/composables/useKeyboardShortcuts'
 import { useAutoSave } from '@/composables/useAutoSave'
+import { useOnboarding } from '@/composables/useOnboarding'
+import OnboardingOverlay from './OnboardingOverlay.vue'
 
 const props = defineProps<{
   board: Board
@@ -38,6 +40,15 @@ const showStats = ref(false)
 const activeTags = ref<string[]>([])
 const showTagFilter = ref(false)
 const { status: saveStatus } = useAutoSave(() => props.board)
+const {
+  isActive: showOnboarding,
+  currentStep,
+  steps: onboardingSteps,
+  start: startOnboarding,
+  next: nextStep,
+  skip: skipOnboarding,
+  currentStepData,
+} = useOnboarding()
 
 function onClickOutside(event: MouseEvent) {
   const target = event.target as HTMLElement
@@ -46,7 +57,10 @@ function onClickOutside(event: MouseEvent) {
   }
 }
 
-onMounted(() => document.addEventListener('click', onClickOutside))
+onMounted(() => {
+  document.addEventListener('click', onClickOutside)
+  startOnboarding()
+})
 onUnmounted(() => document.removeEventListener('click', onClickOutside))
 
 useKeyboardShortcuts({
@@ -366,6 +380,15 @@ function toggleTag(tagId: string) {
         <div class="add-column">
           <input v-model="newColumnTitle" placeholder="Новая колонка..." @keyup.enter="addColumn" />
           <button @click="addColumn">+ Добавить</button>
+          <div class="hotkeys-hint">
+            <h4>Горячие клавиши</h4>
+            <div class="hotkey-item"><kbd>N</kbd> <span>Новая карточка</span></div>
+            <div class="hotkey-item"><kbd>Ctrl+Z</kbd> <span>Отменить</span></div>
+            <div class="hotkey-item"><kbd>Tab</kbd> <span>Навигация</span></div>
+            <div class="hotkey-item"><kbd>Enter</kbd> <span>Открыть карточку</span></div>
+            <div class="hotkey-item"><kbd>Escape</kbd> <span>Закрыть модалку</span></div>
+            <div class="hotkey-item"><kbd>Delete</kbd> <span>Удалить карточку</span></div>
+          </div>
         </div>
       </div>
 
@@ -415,6 +438,14 @@ function toggleTag(tagId: string) {
       </Transition>
     </div>
   </div>
+  <OnboardingOverlay
+    v-if="showOnboarding"
+    :step="currentStepData"
+    :current="currentStep"
+    :total="onboardingSteps.length"
+    @next="nextStep"
+    @skip="skipOnboarding"
+  />
 </template>
 
 <style scoped>
@@ -752,6 +783,55 @@ function toggleTag(tagId: string) {
 .add-column button:hover {
   background: rgba(139, 92, 246, 0.15);
   color: #a78bfa;
+}
+
+.hotkeys-hint {
+  margin-top: 20px;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.hotkeys-hint h4 {
+  margin: 0 0 10px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+}
+
+.hotkey-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.hotkey-item kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  font-size: 10px;
+  font-family: 'Outfit', sans-serif;
+  color: var(--text-secondary);
+  min-width: 20px;
+  text-align: center;
+}
+
+[data-theme='light'] .hotkeys-hint {
+  border-color: rgba(0, 0, 0, 0.06);
+  background: rgba(0, 0, 0, 0.02);
+}
+
+[data-theme='light'] .hotkey-item kbd {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
 }
 
 /* панель истории */
