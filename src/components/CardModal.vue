@@ -8,6 +8,7 @@ import { formatDate } from '@/utils/format'
 import { marked } from 'marked'
 import { useTemplateStore } from '@/stores/templates'
 import { useKeyboardShortcuts } from '@/composables/useKeyboardShortcuts'
+import { useFocusTrap } from '@/composables/useFocusTrap'
 
 const props = defineProps<{
   card: Card
@@ -40,6 +41,8 @@ const newSubTask = ref('')
 const newComment = ref('')
 const { addToast } = useToast()
 const { addTemplate } = useTemplateStore()
+
+useFocusTrap(overlayRef)
 
 onMounted(() => {
   overlayRef.value?.focus()

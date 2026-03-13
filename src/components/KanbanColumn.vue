@@ -238,7 +238,12 @@ function duplicateCard(card: Card) {
       @start="saveSnapshot"
     >
       <template #item="{ element }">
-        <KanbanCard v-if="!element.archived" :card="element" @click="selectedCard = element" />
+        <KanbanCard
+          v-if="!element.archived"
+          :card="element"
+          @click="selectedCard = element"
+          @open="selectedCard = element"
+        />
       </template>
       <template #footer>
         <div v-if="filteredCards.length === 0" class="empty-placeholder">

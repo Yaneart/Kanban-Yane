@@ -5,10 +5,14 @@ import { formatDate } from '@/utils/format'
 defineProps<{
   card: Card
 }>()
+
+defineEmits<{
+  open: []
+}>()
 </script>
 
 <template>
-  <div :class="['kanban-card', card.priority]">
+  <div :class="['kanban-card', card.priority]" tabindex="0" @keydown.enter="$emit('open')">
     <div :class="['priority-dot', card.priority]"></div>
     <div class="drag-handle">
       <span class="grip-lines"></span>
@@ -255,6 +259,18 @@ defineProps<{
   margin: 0;
 }
 
+.kanban-card:focus {
+  outline: none;
+  border-color: rgba(var(--col-color), 0.4);
+  box-shadow:
+    0 0 0 2px rgba(var(--col-color), 0.15),
+    0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.kanban-card:focus::after {
+  opacity: 1;
+}
+
 /* светлая тема */
 [data-theme='light'] .kanban-card {
   background: rgba(255, 255, 255, 0.7);
@@ -280,5 +296,12 @@ defineProps<{
 
 [data-theme='light'] .drag-handle:hover {
   background: rgba(0, 0, 0, 0.04);
+}
+
+[data-theme='light'] .kanban-card:focus {
+  border-color: rgba(var(--col-color), 0.5);
+  box-shadow:
+    0 0 0 2px rgba(var(--col-color), 0.2),
+    0 4px 12px rgba(var(--col-color), 0.1);
 }
 </style>
