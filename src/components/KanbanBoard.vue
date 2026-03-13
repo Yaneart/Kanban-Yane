@@ -12,6 +12,7 @@ import { useBoardActions } from '@/composables/useBoardActions'
 import BoardStats from './BoardStats.vue'
 import { availableTags } from '@/data/tags'
 import { useKeyboardShortcuts } from '@/composables/useKeyboardShortcuts'
+import { useAutoSave } from '@/composables/useAutoSave'
 
 const props = defineProps<{
   board: Board
@@ -36,6 +37,7 @@ const { exportBoard, importBoard } = useBoardActions(props.board, emit, addHisto
 const showStats = ref(false)
 const activeTags = ref<string[]>([])
 const showTagFilter = ref(false)
+const { status: saveStatus } = useAutoSave(() => props.board)
 
 function onClickOutside(event: MouseEvent) {
   const target = event.target as HTMLElement
@@ -199,6 +201,11 @@ function toggleTag(tagId: string) {
       </RouterLink>
       <div class="header-divider"></div>
       <h1 class="board-title">{{ board.title }}</h1>
+      <Transition name="fade">
+        <span v-if="saveStatus !== 'idle'" class="save-indicator">
+          {{ saveStatus === 'saving' ? 'Сохранение...' : 'Сохранено ✓' }}
+        </span>
+      </Transition>
 
       <div class="header-center">
         <div class="search-wrapper">
@@ -967,6 +974,16 @@ function toggleTag(tagId: string) {
   padding: 1px 6px;
   border-radius: 6px;
   margin-left: 2px;
+}
+
+.save-indicator {
+  font-size: 10px;
+  color: var(--text-muted);
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* мобильная версия */
