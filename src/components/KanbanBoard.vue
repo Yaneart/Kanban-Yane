@@ -207,7 +207,7 @@ function toggleTag(tagId: string) {
 </script>
 
 <template>
-  <div class="kanban-board" :style="boardStyle">
+  <main class="kanban-board" :style="boardStyle">
     <!-- шапка -->
     <header class="board-header">
       <RouterLink to="/" class="logo-link" title="На главную">
@@ -224,7 +224,12 @@ function toggleTag(tagId: string) {
       <div class="header-center">
         <div class="search-wrapper">
           <span class="search-icon">🔍</span>
-          <input v-model="searchQuery" class="search-input" placeholder="Поиск..." />
+          <input
+            v-model="searchQuery"
+            class="search-input"
+            placeholder="Поиск..."
+            aria-label="Поиск карточек"
+          />
         </div>
       </div>
 
@@ -234,6 +239,7 @@ function toggleTag(tagId: string) {
             class="action-btn"
             :class="{ active: showBgPicker }"
             title="Фон доски"
+            :aria-expanded="showBgPicker"
             @click="
               () => {
                 showBgPicker = !showBgPicker
@@ -247,6 +253,7 @@ function toggleTag(tagId: string) {
             class="action-btn"
             :class="{ active: showTagFilter }"
             title="Фильтр по тегам"
+            :aria-expanded="showTagFilter"
             @click="
               () => {
                 showTagFilter = !showTagFilter
@@ -261,6 +268,7 @@ function toggleTag(tagId: string) {
             class="action-btn"
             :class="{ active: showHistory }"
             title="История действий"
+            :aria-expanded="showHistory"
             @click="togglePanel('history')"
           >
             История
@@ -269,6 +277,7 @@ function toggleTag(tagId: string) {
             class="action-btn"
             :class="{ active: showArchive }"
             title="Архив карточек"
+            :aria-expanded="showArchive"
             @click="togglePanel('archive')"
           >
             Архив
@@ -277,13 +286,14 @@ function toggleTag(tagId: string) {
             class="action-btn"
             :class="{ active: showStats }"
             title="Статистика"
+            :aria-expanded="showStats"
             @click="togglePanel('stats')"
           >
             Статистика
           </button>
         </div>
 
-        <button class="action-btn theme-btn" title="Сменить тему" @click="themeStore.toggleTheme()">
+        <button class="action-btn theme-btn" title="Сменить тему" aria-label="Переключить тему" @click="themeStore.toggleTheme()">
           {{ themeStore.theme === 'dark' ? '☀' : '☾' }}
         </button>
 
@@ -292,6 +302,8 @@ function toggleTag(tagId: string) {
             class="action-btn"
             :class="{ active: showMenu }"
             title="Дополнительно"
+            aria-label="Меню"
+            :aria-expanded="showMenu"
             @click="showMenu = !showMenu"
           >
             ⋮
@@ -437,7 +449,7 @@ function toggleTag(tagId: string) {
         </aside>
       </Transition>
     </div>
-  </div>
+  </main>
   <OnboardingOverlay
     v-if="showOnboarding"
     :step="currentStepData"

@@ -169,7 +169,12 @@ function duplicateCard(card: Card) {
 </script>
 
 <template>
-  <div class="kanban-column" :class="{ 'over-limit': isOverLimit }">
+  <div
+    class="kanban-column"
+    :class="{ 'over-limit': isOverLimit }"
+    role="region"
+    :aria-label="column.title"
+  >
     <div class="column-header">
       <template v-if="isEditing">
         <input

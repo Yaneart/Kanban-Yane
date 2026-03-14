@@ -12,7 +12,13 @@ defineEmits<{
 </script>
 
 <template>
-  <div :class="['kanban-card', card.priority]" tabindex="0" @keydown.enter="$emit('open')">
+  <div
+    :class="['kanban-card', card.priority]"
+    tabindex="0"
+    @keydown.enter="$emit('open')"
+    role="article"
+    :aria-label="card.title + (card.subtask?.length ? `, подзадач: ${card.subtask.length}` : '')"
+  >
     <div :class="['priority-dot', card.priority]"></div>
     <div class="drag-handle">
       <span class="grip-lines"></span>

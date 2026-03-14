@@ -66,7 +66,14 @@ const maxInColumn = computed(() => {
     </div>
   </div>
 
-  <div class="columns-section">
+  <div
+    class="columns-section"
+    role="progressbar"
+    :aria-valuenow="completionPercent"
+    aria-valuemin="0"
+    aria-valuemax="100"
+  >
+    >
     <h4>По колонкам</h4>
     <div class="column-stat" v-for="(col, index) in columnStats" :key="index">
       <div class="column-stat-header">

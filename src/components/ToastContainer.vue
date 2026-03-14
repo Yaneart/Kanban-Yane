@@ -6,7 +6,7 @@ const { toasts } = useToast()
 
 <template>
   <Teleport to="body">
-    <div class="toast-container">
+    <div class="toast-container" aria-live="polite" aria-atomic="true">
       <TransitionGroup name="toast">
         <div v-for="toast in toasts" :key="toast.id" :class="['toast', `toast-${toast.type}`]">
           {{ toast.message }}

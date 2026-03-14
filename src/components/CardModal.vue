@@ -228,14 +228,18 @@ function saveAsTemplate() {
       @click.self="emit('close')"
       @keydown.escape="emit('close')"
       tabindex="0"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
     >
+      >
       <div class="modal-content">
         <button class="btn-icon modal-close" @click="emit('close')">✕</button>
 
         <!-- просмотр -->
         <div v-if="!isEditing" class="modal-view">
           <div class="modal-header">
-            <h2>{{ card.title }}</h2>
+            <h2 id="modal-title">{{ card.title }}</h2>
             <span class="badge priority-badge" :class="card.priority" @click="togglePriority">
               {{ priorityLabels[card.priority] }}
             </span>

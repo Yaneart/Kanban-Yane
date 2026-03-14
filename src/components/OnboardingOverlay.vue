@@ -65,7 +65,13 @@ onUnmounted(() => window.removeEventListener('resize', updatePosition))
 </script>
 
 <template>
-  <div class="onboarding-overlay" @click.self="emit('skip')">
+  <div
+    class="onboarding-overlay"
+    @click.self="emit('skip')"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Обучение"
+  >
     <div class="onboarding-tooltip" :style="tooltipStyle">
       <h4>{{ step.title }}</h4>
       <p>{{ step.text }}</p>
